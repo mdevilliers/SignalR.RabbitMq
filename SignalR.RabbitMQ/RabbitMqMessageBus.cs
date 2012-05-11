@@ -15,7 +15,7 @@ namespace SignalR.RabbitMQ
         private readonly InProcessMessageBus<long> _bus;
         private readonly IModel _rabbitmqchannel;
         private readonly string _rabbitmqExchangeName;
-        private Task _connectingTask;
+        private int _resource = 0;
         private int _count;
 
         public RabbitMqMessageBus(IDependencyResolver resolver, string rabbitMqExchangeName, IModel rabbitMqChannel)
@@ -64,7 +64,7 @@ namespace SignalR.RabbitMQ
         {
             var tcs = new TaskCompletionSource<Object>();
 
-            if (Interlocked.CompareExchange(ref _connectingTask, tcs.Task, null) != null)
+            if (1 == Interlocked.Exchange(ref _resource, 1))
             {
                 return;
             }
