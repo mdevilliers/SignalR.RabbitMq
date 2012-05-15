@@ -33,7 +33,7 @@ channel.ExchangeDeclare(exchange, "topic", true);
 GlobalHost.DependencyResolver.UseRabbitMq(exchange, channel);
 ```
 
-The SignalR.RabbitMq messagebus expects to be handed an instance of IModel as produced by the RabbitMq.Client and the name of a message exchange to be used for the signalr messages.
+The SignalR.RabbitMq message bus expects to be handed an instance of IModel as produced by the RabbitMq.Client and the name of a message exchange to be used for the signalr messages.
 
 Any configuration or authentication for the message exchange is expected to be done before configuring the message bus.
 
