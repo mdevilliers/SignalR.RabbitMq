@@ -11,13 +11,13 @@ Installation
 
 A compiled library is available via NuGet
 
-Via the nuget package console
+To install via the nuget package console
 
 ```PS
 Install-Package SignalR.RabbitMq
 ```
 
-To install via the nuget user interface in Visual Studio the package to search for is SignalR.RabbitMq
+To install via the nuget user interface in Visual Studio the package to search for is "SignalR.RabbitMq"
 
 
 Useage
@@ -39,7 +39,7 @@ Any configuration or authentication for the message exchange is expected to be d
 
 The message exchange would usually be either be of type "topic" or "fanout". 
 
-The message bus will then listen on an anonymous queue for messages accross the web farm. There will be one queue per server in the web farm.
+The message bus will then listen on an anonymous queue for messages across the web farm. There will be one queue per server in the web farm.
 
 The message exchange should only be used for signalr messages.
 
