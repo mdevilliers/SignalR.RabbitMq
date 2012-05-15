@@ -37,6 +37,8 @@ The SignalR.RabbitMq messagebus expects to be handed an instance of IModel as pr
 
 Any configuration or authentication for the message exchange is expected to be done before configuring the message bus.
 
+The message exchange would usually be either be of type "topic" or "fanout". 
+
 The message bus will then listen on an anonymous queue for messages accross the web farm. There will be one queue per server in the web farm.
 
 The message exchange should only be used for signalr messages.
