@@ -26,20 +26,19 @@ Useage
 The example project shows how you could configure the message bus in the global.asax.cs file.
 
 ```CSHARP
-var exchange = "SignalRExchange";
-var connection = factory.CreateConnection();
-var channel = connection.CreateModel();
-channel.ExchangeDeclare(exchange, "topic", true);
-GlobalHost.DependencyResolver.UseRabbitMq(exchange, channel);
+var factory = new ConnectionFactory 
+		{ 
+			UserName = "guest",
+			Password = "guest"
+		};
+
+var exchangeName = "SignalRExchange";
+GlobalHost.DependencyResolver.UseRabbitMq(factory, exchangeName);
 ```
 
-The SignalR.RabbitMq message bus expects to be handed an instance of IModel as produced by the RabbitMq.Client and the name of a message exchange to be used for the signalr messages.
+The SignalR.RabbitMq message bus expects to be handed an instance of a configured ConnectionFactory as produced by the RabbitMq.Client and the name of a message exchange to be used for the signalr messages.
 
-Any configuration or authentication for the message exchange is expected to be done before configuring the message bus.
-
-The message exchange would usually be either be of type "topic" or "fanout". 
-
-The message bus will then listen on an anonymous queue for messages across the web farm. There will be one queue per server in the web farm.
+The message bus will then create the exchange if it does not already exist then listen on an anonymous queue for messages across the web farm. There will be one queue per server in the web farm.
 
 The message exchange should only be used for signalr messages.
 
