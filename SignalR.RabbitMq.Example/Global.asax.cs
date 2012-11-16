@@ -6,6 +6,7 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Microsoft.AspNet.SignalR;
 using RabbitMQ.Client;
 using SignalR.RabbitMQ;
 
@@ -51,14 +52,14 @@ namespace SignalR.RabbitMq.Example
 
             BundleTable.Bundles.RegisterTemplateBundles();
 
-            var exchange = "SignalRExchange";
+            var factory = new ConnectionFactory 
+            { 
+                UserName = "guest",
+                Password = "guest"
+            };
 
-            var connection = factory.CreateConnection();
-            var channel = connection.CreateModel();
-            channel.ExchangeDeclare(exchange, "topic", true);
-
-            GlobalHost.DependencyResolver.UseRabbitMq(exchange, channel);
-
+            var exchangeName = "SignalRExchange";
+            GlobalHost.DependencyResolver.UseRabbitMq(factory, exchangeName);
         }
     }
 }

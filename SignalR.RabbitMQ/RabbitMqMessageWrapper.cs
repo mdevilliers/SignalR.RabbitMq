@@ -1,28 +1,34 @@
 using System;
-using System.Runtime.Serialization;
+using System.Text;
+using Microsoft.AspNet.SignalR;
+using Newtonsoft.Json;
 
 namespace SignalR.RabbitMQ
 {
     [Serializable]
-    [DataContract]
-    public class RabbitMqMessageWrapper
+    internal class RabbitMqMessageWrapper
     {
-        public RabbitMqMessageWrapper()
+        public RabbitMqMessageWrapper(ulong id, string key, Message[] message)
         {
+            Id = id;
+            Key = key;
+            Messages = message;
         }
 
-        public RabbitMqMessageWrapper(string connectionId, string eventKey, object value)
+        public ulong Id { get; set; }
+        public string Key { get; set; }
+        public Message[] Messages { get; set; }
+
+        public byte[] GetBytes()
         {
-            ConnectionIdentifier = connectionId;
-            EventKey = eventKey;
-            Value = value.ToString();
+            var s = JsonConvert.SerializeObject(this);
+            return Encoding.UTF8.GetBytes(s);
         }
 
-        [DataMember]
-        public string EventKey { get; private set; }
-        [DataMember]
-        public string ConnectionIdentifier { get; private set; }
-        [DataMember]
-        public object Value { get; private set; }
+        public static RabbitMqMessageWrapper Deserialize(byte[] data)
+        {
+            var s = Encoding.UTF8.GetString(data);
+            return JsonConvert.DeserializeObject<RabbitMqMessageWrapper>(s);
+        }
     }
 }

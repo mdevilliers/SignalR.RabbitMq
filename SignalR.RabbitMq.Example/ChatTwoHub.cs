@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using SignalR.Hubs;
+﻿
+using Microsoft.AspNet.SignalR.Hubs;
 
 namespace SignalR.RabbitMq.Example
 {
@@ -11,8 +8,7 @@ namespace SignalR.RabbitMq.Example
     {
         public void Send(string message)
         {
-            // Call the addMessage method on all clients
-            Clients.addMessage("chat2 " + message);
+            Clients.All.addMessage("chat2 " + message);
         }
     }
 }

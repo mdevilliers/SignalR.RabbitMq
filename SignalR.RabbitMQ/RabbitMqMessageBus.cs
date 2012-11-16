@@ -1,102 +1,106 @@
-﻿using System;
+﻿using Microsoft.AspNet.SignalR;
+using RabbitMQ.Client;
+using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 
 namespace SignalR.RabbitMQ
 {
-    public class RabbitMqMessageBus : IMessageBus, IIdGenerator<long>
+    internal class RabbitMqMessageBus : ScaleoutMessageBus
     {
-        private readonly InProcessMessageBus<long> _bus;
-        private readonly IModel _rabbitmqchannel;
-        private readonly string _rabbitmqExchangeName;
+        private RabbitConnection _rabbitConnection;
+        private Task _rabbitConnectiontask;
         private int _resource = 0;
-        private int _count;
 
-        public RabbitMqMessageBus(IDependencyResolver resolver, string rabbitMqExchangeName, IModel rabbitMqChannel)
+        public RabbitMqMessageBus(IDependencyResolver resolver, ConnectionFactory connectionfactory, string rabbitMqExchangeName)
+            : base(resolver)
         {
-            _bus = new InProcessMessageBus<long>(resolver, this);
-            _rabbitmqchannel = rabbitMqChannel;
-            _rabbitmqExchangeName = rabbitMqExchangeName;
-
-            EnsureConnection();
+            ConnectToRabbit( connectionfactory, rabbitMqExchangeName);
         }
 
-        public Task<MessageResult> GetMessages(IEnumerable<string> eventKeys, string id, CancellationToken timeoutToken)
+        public override void Dispose()
         {
-            return _bus.GetMessages(eventKeys, id, timeoutToken);
+            if(_rabbitConnection != null)
+            {
+                _rabbitConnection.Dispose();
+            }
+            base.Dispose();
         }
 
-        public Task Send(string connectionId, string eventKey, object value)
+        private void ConnectToRabbit(ConnectionFactory connectionfactory, string rabbitMqExchangeName)
         {
-            var message = new RabbitMqMessageWrapper(connectionId, eventKey, value);
-            return Task.Factory.StartNew(SendMessage, message);
-        }
-
-        public long ConvertFromString(string value)
-        {
-            return Int64.Parse(value, CultureInfo.InvariantCulture);
-        }
-
-        public string ConvertToString(long value)
-        {
-            return value.ToString(CultureInfo.InvariantCulture);
-        }
-
-        public long GetNext()
-        {
-            return _count++;
-        }
-
-        private void SendMessage(object state)
-        {
-            var message = (RabbitMqMessageWrapper) state;
-            byte[] payload = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
-            _rabbitmqchannel.BasicPublish(_rabbitmqExchangeName, message.EventKey, null, payload);
-        }
-
-        private void EnsureConnection()
-        {
-            var tcs = new TaskCompletionSource<Object>();
-
             if (1 == Interlocked.Exchange(ref _resource, 1))
             {
                 return;
             }
 
-            ThreadPool.QueueUserWorkItem(_ =>
-                {
-                    try
+            _rabbitConnection = new RabbitConnection(connectionfactory, rabbitMqExchangeName);
+            _rabbitConnection.OnMessage( wrapper => OnReceived(wrapper.Key, wrapper.Id, wrapper.Messages));
+
+            _rabbitConnectiontask = _rabbitConnection.StartListening();
+            _rabbitConnectiontask.ContinueWith(
+                t =>
                     {
-
-                        var queue = _rabbitmqchannel.QueueDeclare("", false, false, true, null);
-                        _rabbitmqchannel.QueueBind(queue.QueueName, _rabbitmqExchangeName, "#");
-
-                        var consumer = new QueueingBasicConsumer(_rabbitmqchannel);
-                        _rabbitmqchannel.BasicConsume(queue.QueueName, false, consumer);
-
-                        while (true)
-                        {
-                            var ea = (BasicDeliverEventArgs) consumer.Queue.Dequeue();
-
-                            _rabbitmqchannel.BasicAck(ea.DeliveryTag, false);
-
-                            string json = Encoding.UTF8.GetString(ea.Body);
-                                                  
-                            var message = JsonConvert.DeserializeObject<RabbitMqMessageWrapper>(json);
-                            _bus.Send(message.ConnectionIdentifier, message.EventKey, message.Value);
-                        }
+                        Interlocked.Exchange(ref _resource, 0);
+                        ConnectToRabbit(connectionfactory, rabbitMqExchangeName);
                     }
-                    catch (Exception ex)
-                    {
-                        tcs.SetException(ex);
-                    }
-                });
+                );
+            _rabbitConnectiontask.ContinueWith(
+                  t =>
+                  {
+                      Interlocked.Exchange(ref _resource, 0);
+                      ConnectToRabbit(connectionfactory, rabbitMqExchangeName);
+                  },
+                  CancellationToken.None,
+                  TaskContinuationOptions.OnlyOnFaulted,
+                  TaskScheduler.Default
+            );
+
+        }
+
+        protected override Task Send(Message[] messages)
+        {
+            return Task.Factory.StartNew(msgs =>
+            {
+                var taskCompletionSource = new TaskCompletionSource<object>();
+
+                // Group messages by source (connection id)
+                var messagesBySource = messages.GroupBy(m => m.Source);
+
+                SendImpl(messagesBySource.GetEnumerator(), taskCompletionSource);
+
+                return taskCompletionSource.Task;
+            },
+            messages);
+        }
+
+        private void SendImpl(IEnumerator<IGrouping<string, Message>> enumerator, TaskCompletionSource<object> taskCompletionSource)
+        {
+            if (!enumerator.MoveNext())
+            {
+                taskCompletionSource.TrySetResult(null);
+            }
+            else
+            {
+                IGrouping<string, Message> group = enumerator.Current;
+
+                Task.Factory.StartNew(() =>
+                                        {
+                                            var message = new RabbitMqMessageWrapper(GetNext(), group.Key, group.ToArray());
+                                            _rabbitConnection.Send(message);
+                                        }
+                                    )
+                                    .Then((enumer, tcs) => SendImpl(enumer, tcs), enumerator, taskCompletionSource)
+                                    .ContinueWithNotComplete(taskCompletionSource);
+
+            }
+        }
+
+        private ulong GetNext()
+        {
+            return (ulong) DateTime.Now.Ticks;
         }
     }
 }

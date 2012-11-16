@@ -3,19 +3,25 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
- <script type="text/javascript">
+  
+  <input type="text" id="msg" />
+  <input type="button" id="broadcast" value="broadcast" />
+
+  <ul id="messages">  </ul>
+
+<script type="text/javascript">
      $(function () {
          // Proxy created on the fly
          var chat = $.connection.chatTwo;
 
          // Declare a function on the chat hub so the server can invoke it
-         chat.addMessage = function (message) {
+         chat.client.addMessage = function (message) {
              $('#messages').append('<li>' + message + '</li>');
          };
 
          $("#broadcast").click(function () {
              // Call the chat method on the server
-             chat.send($('#msg').val())
+             chat.server.send($('#msg').val())
               .done(function () {
                   console.log('Success!');
               })
@@ -24,13 +30,13 @@
               });
          });
 
+         $("#broadcast").hide();
+
          // Start the connection
-         $.connection.hub.start();
+         $.connection.hub.start().done(function () {
+             $("#broadcast").show();
+         });
      });
   </script>
-  
-  <input type="text" id="msg" />
-  <input type="button" id="broadcast" value="broadcast" />
 
-  <ul id="messages">
-  </ul>
+
