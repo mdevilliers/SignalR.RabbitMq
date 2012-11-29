@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNet.SignalR;
 using RabbitMQ.Client;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -87,7 +86,7 @@ namespace SignalR.RabbitMQ
 
                 Task.Factory.StartNew(() =>
                                         {
-                                            var message = new RabbitMqMessageWrapper(GetNext(), group.Key, group.ToArray());
+                                            var message = new RabbitMqMessageWrapper(group.Key, group.ToArray());
                                             _rabbitConnection.Send(message);
                                         }
                                     )
@@ -95,11 +94,6 @@ namespace SignalR.RabbitMQ
                                     .ContinueWithNotComplete(taskCompletionSource);
 
             }
-        }
-
-        private ulong GetNext()
-        {
-            return (ulong) DateTime.Now.Ticks;
         }
     }
 }

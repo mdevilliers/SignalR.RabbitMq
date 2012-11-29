@@ -17,7 +17,7 @@ namespace SignalR.RabbitMQ
             _rabbitConnection = rabbitConnection;
         }
 
-        public void ListenInOnClientMessages(string clientsideInvocation, Action<ClientHubInvocation> handler)
+        public void ListenInOnClientMessages(string clientsideInvocation ,Action<string,ClientHubInvocation> handler)
         {
             if (string.IsNullOrEmpty(clientsideInvocation))
             {
@@ -35,14 +35,14 @@ namespace SignalR.RabbitMQ
 
                   foreach (var message in messages)
                   {
-                      if (!IsSignalRServerMethod(message.Key))
+                      if (!IsSignalRServerMethod(message.Key) && message.Value != null)
                       {
                           var hubMessage =
                               JsonConvert.DeserializeObject<ClientHubInvocation>(message.Value);
 
                           if (!string.IsNullOrEmpty(hubMessage.Method) && hubMessage.Method.Equals(clientsideInvocation))
                           {
-                              handler.Invoke(hubMessage);
+                              handler.Invoke(message.Source, hubMessage);
                           }
                       }
                   }

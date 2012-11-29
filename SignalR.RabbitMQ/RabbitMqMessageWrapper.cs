@@ -10,9 +10,9 @@ namespace SignalR.RabbitMQ
     {
         private static readonly Encoding _encoding = Encoding.UTF8;
 
-        public RabbitMqMessageWrapper(ulong id, string key, Message[] message)
+        public RabbitMqMessageWrapper(string key, Message[] message)
         {
-            Id = id;
+            Id = GetNext();
             Key = key;
             Messages = message;
         }
@@ -31,6 +31,11 @@ namespace SignalR.RabbitMQ
         {
             var s = _encoding.GetString(data);
             return JsonConvert.DeserializeObject<RabbitMqMessageWrapper>(s);
+        }
+
+        private static ulong GetNext()
+        {
+            return (ulong) DateTime.Now.Ticks;
         }
     }
 }

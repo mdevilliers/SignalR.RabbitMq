@@ -88,6 +88,7 @@ namespace SignalR.RabbitMQ
 
                                                                   foreach (var handler in handlersToInform)
                                                                   {
+
                                                                       handler.Invoke(message);
                                                                   }
                                                               }, _handlers);
