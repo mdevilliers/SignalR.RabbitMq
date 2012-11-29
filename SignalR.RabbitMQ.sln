@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalR.RabbitMQ", "SignalR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalR.RabbitMq.Example", "SignalR.RabbitMq.Example\SignalR.RabbitMq.Example.csproj", "{14E5A280-2BF5-462C-8D30-4082C138FADB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalR.RabbitMQ.Console", "SignalR.RabbitMQ.Console\SignalR.RabbitMQ.Console.csproj", "{EA9E7970-6269-4C71-92CC-860DE97BF985}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{14E5A280-2BF5-462C-8D30-4082C138FADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{14E5A280-2BF5-462C-8D30-4082C138FADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{14E5A280-2BF5-462C-8D30-4082C138FADB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA9E7970-6269-4C71-92CC-860DE97BF985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA9E7970-6269-4C71-92CC-860DE97BF985}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA9E7970-6269-4C71-92CC-860DE97BF985}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA9E7970-6269-4C71-92CC-860DE97BF985}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

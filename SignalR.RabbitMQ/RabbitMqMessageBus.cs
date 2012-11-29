@@ -65,7 +65,6 @@ namespace SignalR.RabbitMQ
             return Task.Factory.StartNew(msgs =>
             {
                 var taskCompletionSource = new TaskCompletionSource<object>();
-
                 // Group messages by source (connection id)
                 var messagesBySource = messages.GroupBy(m => m.Source);
 

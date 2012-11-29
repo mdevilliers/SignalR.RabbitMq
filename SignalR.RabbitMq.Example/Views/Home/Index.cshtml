@@ -7,7 +7,10 @@
   <input type="text" id="msg" />
   <input type="button" id="broadcast" value="broadcast" />
 
-  <ul id="messages">  </ul>
+<p>Messages : </p>
+<ul id="messages">  </ul>
+<p>Users : </p>
+  <ul id="users">  </ul>
 
 <script type="text/javascript">
     $(function () {
@@ -15,8 +18,12 @@
         var chat = $.connection.chat;
 
         // Declare a function on the chat hub so the server can invoke it
-        chat.client.addMessage = function (message) {
-            $('#messages').append('<li>' + message + '</li>');
+        chat.client.addMessage = function (message, from) {
+            $('#messages').append('<li>' + message  + " from " + from + '</li>');
+        };
+
+        chat.client.userJoined = function (message) {
+            $('#users').append('<li>' + message + '</li>');
         };
 
         $("#broadcast").click(function () {
@@ -34,7 +41,8 @@
 
         // Start the connection
         $.connection.hub.start().done(function () {
-           $("#broadcast").show();
+            $("#broadcast").show();
+            chat.server.notifyJoined();
         });
     });
   </script>

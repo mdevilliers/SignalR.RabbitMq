@@ -6,8 +6,10 @@ using Newtonsoft.Json;
 namespace SignalR.RabbitMQ
 {
     [Serializable]
-    internal class RabbitMqMessageWrapper
+    public class RabbitMqMessageWrapper
     {
+        private static readonly Encoding _encoding = Encoding.UTF8;
+
         public RabbitMqMessageWrapper(ulong id, string key, Message[] message)
         {
             Id = id;
@@ -22,12 +24,12 @@ namespace SignalR.RabbitMQ
         public byte[] GetBytes()
         {
             var s = JsonConvert.SerializeObject(this);
-            return Encoding.UTF8.GetBytes(s);
+            return _encoding.GetBytes(s);
         }
 
         public static RabbitMqMessageWrapper Deserialize(byte[] data)
         {
-            var s = Encoding.UTF8.GetString(data);
+            var s = _encoding.GetString(data);
             return JsonConvert.DeserializeObject<RabbitMqMessageWrapper>(s);
         }
     }

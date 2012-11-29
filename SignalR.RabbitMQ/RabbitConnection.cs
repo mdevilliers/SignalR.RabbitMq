@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using RabbitMQ.Client;
@@ -6,18 +8,19 @@ using RabbitMQ.Client.Events;
 
 namespace SignalR.RabbitMQ
 {
-    internal class RabbitConnection : IDisposable
+    public class RabbitConnection : IDisposable
     {
         private readonly ConnectionFactory _rabbitMqConnectionfactory;
         private readonly string _rabbitMqExchangeName;
         private IModel _channel;
-        private Action<RabbitMqMessageWrapper> _handler;
+        private IList<Action<RabbitMqMessageWrapper>> _handlers;
         private CancellationTokenSource _cancellationTokenSource;
         
         public RabbitConnection(ConnectionFactory connectionfactory, string rabbitMqExchangeName)
         {
             _rabbitMqConnectionfactory = connectionfactory;
             _rabbitMqExchangeName = rabbitMqExchangeName;
+            _handlers = new List<Action<RabbitMqMessageWrapper>>();
         }
 
         public void OnMessage(Action<RabbitMqMessageWrapper> handler)
@@ -26,7 +29,7 @@ namespace SignalR.RabbitMQ
             {
                 throw new ArgumentNullException("handler");
             }
-            _handler = handler;
+            _handlers.Add(handler);
         }
 
         public Task Send(RabbitMqMessageWrapper message)
@@ -70,12 +73,29 @@ namespace SignalR.RabbitMQ
 
                             while (_channel.IsOpen && !token.IsCancellationRequested)
                             {
-                                var ea = (BasicDeliverEventArgs) consumer.Queue.Dequeue();
+                                try
+                                {
+                                    var ea = (BasicDeliverEventArgs) consumer.Queue.Dequeue();
+                                    _channel.BasicAck(ea.DeliveryTag, false);
 
-                                _channel.BasicAck(ea.DeliveryTag, false);
+                                    Task.Factory.StartNew((handlers) =>
+                                                              {
+                                                                  var message =
+                                                                      RabbitMqMessageWrapper.Deserialize(ea.Body);
 
-                                var message = RabbitMqMessageWrapper.Deserialize(ea.Body);
-                                _handler.Invoke(message);
+                                                                  var handlersToInform =
+                                                                      (IList<Action<RabbitMqMessageWrapper>>) handlers;
+
+                                                                  foreach (var handler in handlersToInform)
+                                                                  {
+                                                                      handler.Invoke(message);
+                                                                  }
+                                                              }, _handlers);
+
+                                }catch(EndOfStreamException eose)
+                                {
+                                    //ignore
+                                }
                             }
                         },token);
 
