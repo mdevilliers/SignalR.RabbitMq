@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNet.SignalR;
 using RabbitMQ.Client;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,37 +62,15 @@ namespace SignalR.RabbitMQ
         {
             return Task.Factory.StartNew(msgs =>
             {
-                var taskCompletionSource = new TaskCompletionSource<object>();
-                // Group messages by source (connection id)
-                var messagesBySource = messages.GroupBy(m => m.Source);
+                var messagesToSend = msgs as Message[];
+                messagesToSend.GroupBy(m => m.Source).ToList().ForEach(group =>
+                {
+                    var message = new RabbitMqMessageWrapper(group.Key, group.ToArray());
+                    _rabbitConnection.Send(message);
 
-                SendImpl(messagesBySource.GetEnumerator(), taskCompletionSource);
-
-                return taskCompletionSource.Task;
+                 });
             },
             messages);
-        }
-
-        private void SendImpl(IEnumerator<IGrouping<string, Message>> enumerator, TaskCompletionSource<object> taskCompletionSource)
-        {
-            if (!enumerator.MoveNext())
-            {
-                taskCompletionSource.TrySetResult(null);
-            }
-            else
-            {
-                IGrouping<string, Message> group = enumerator.Current;
-
-                Task.Factory.StartNew(() =>
-                                        {
-                                            var message = new RabbitMqMessageWrapper(group.Key, group.ToArray());
-                                            _rabbitConnection.Send(message);
-                                        }
-                                    )
-                                    .Then((enumer, tcs) => SendImpl(enumer, tcs), enumerator, taskCompletionSource)
-                                    .ContinueWithNotComplete(taskCompletionSource);
-
-            }
         }
     }
 }

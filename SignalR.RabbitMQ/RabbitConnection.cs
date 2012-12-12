@@ -13,14 +13,13 @@ namespace SignalR.RabbitMQ
         private readonly ConnectionFactory _rabbitMqConnectionfactory;
         private readonly string _rabbitMqExchangeName;
         private IModel _channel;
-        private IList<Action<RabbitMqMessageWrapper>> _handlers;
+        private Action<RabbitMqMessageWrapper> _handler;
         private CancellationTokenSource _cancellationTokenSource;
         
         public RabbitConnection(ConnectionFactory connectionfactory, string rabbitMqExchangeName)
         {
             _rabbitMqConnectionfactory = connectionfactory;
             _rabbitMqExchangeName = rabbitMqExchangeName;
-            _handlers = new List<Action<RabbitMqMessageWrapper>>();
         }
 
         public void OnMessage(Action<RabbitMqMessageWrapper> handler)
@@ -29,7 +28,7 @@ namespace SignalR.RabbitMQ
             {
                 throw new ArgumentNullException("handler");
             }
-            _handlers.Add(handler);
+            _handler= handler;
         }
 
         public Task Send(RabbitMqMessageWrapper message)
@@ -78,20 +77,17 @@ namespace SignalR.RabbitMQ
                                     var ea = (BasicDeliverEventArgs) consumer.Queue.Dequeue();
                                     _channel.BasicAck(ea.DeliveryTag, false);
 
-                                    Task.Factory.StartNew((handlers) =>
+                                    Task.Factory.StartNew((handler) =>
                                                               {
                                                                   var message =
                                                                       RabbitMqMessageWrapper.Deserialize(ea.Body);
 
                                                                   var handlersToInform =
-                                                                      (IList<Action<RabbitMqMessageWrapper>>) handlers;
+                                                                      (Action<RabbitMqMessageWrapper>) handler;
 
-                                                                  foreach (var handler in handlersToInform)
-                                                                  {
-
-                                                                      handler.Invoke(message);
-                                                                  }
-                                                              }, _handlers);
+                                                                  handlersToInform.Invoke(message);
+                                                                  
+                                                              }, _handler);
 
                                 }catch(EndOfStreamException eose)
                                 {

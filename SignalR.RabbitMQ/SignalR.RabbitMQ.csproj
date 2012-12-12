@@ -56,7 +56,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RabbitConnectionEavesdropper.cs" />
     <Compile Include="DependencyResolverExtensions.cs" />
     <Compile Include="RabbitConnection.cs" />
     <Compile Include="RabbitMqMessageBus.cs" />

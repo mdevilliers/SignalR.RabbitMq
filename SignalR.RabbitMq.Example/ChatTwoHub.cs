@@ -4,7 +4,7 @@ using Microsoft.AspNet.SignalR.Hubs;
 namespace SignalR.RabbitMq.Example
 {
     [HubName( "chatTwo")]
-    public class ChatTwoHub : Chat
+    public class ChatTwoHub :Hub
     {
         public void Send(string message)
         {
