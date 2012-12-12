@@ -46,36 +46,44 @@ The message bus will then create the exchange if it does not already exist then 
 The message exchange should only be used for signalr messages.
 
 
-Listen in
----------
+Send to client via message bus
+------------------------------
 
 So you have scaled out your message bus and scaled out SignalR something awesome but what next?
 
-It might be interesting to have other applications see what messages are going back and forward. 
+It might be interesting to send messages directly to connected clients from another process.
 
 From the SignalR.RabbitMQ.Console project -
 
 ```CSHARP
-var connectionfactory = new ConnectionFactory
+
+var factory = new ConnectionFactory
+{
+	UserName = "guest",
+	Password = "guest"
+};
+
+var exchangeName = "SignalRExchange";
+GlobalHost.DependencyResolver.UseRabbitMq(factory, exchangeName);
+
+var hubContext = GlobalHost.ConnectionManager.GetHubContext<Chat>();
+
+Task.Factory.StartNew(
+	() =>
 		{
-			UserName = "guest",
-			Password = "guest"
-		};
-
-var rabbitMqExchangeName = "SignalRExchange";
-
-_rabbitConnection = new RabbitConnection(connectionfactory, rabbitMqExchangeName);
-
-var eavesdropper = new RabbitConnectionEavesdropper(_rabbitConnection);
-
-//these are message sent to and from the Chat Hub in the web project.
-eavesdropper.ListenInOnClientMessages("userJoined", invocation => { System.Console.WriteLine("User joined with connectionid : {0}", invocation.Args[0]); });
-eavesdropper.ListenInOnClientMessages("addMessage", invocation => { System.Console.WriteLine("Message Sent : {0}", invocation.Args[0]); });
-eavesdropper.ListenInOnClientMessages("onDisconnected", invocation => { System.Console.WriteLine("User disconnected with connectionid : {0}", invocation.Args[0]); });
-
-_rabbitConnection.StartListening();
+			while (true)
+			{
+				hubContext.Clients.All.onConsoleMessage("Hello!");
+				Thread.Sleep(1000);
+			}
+		}
+	);
 
 ```
+
+The onConsoleMessage method is a javascript function on the client.
+The message "Hello!" is put onto the message bus and relayed by the web application to the connected clients.
+
 
 FAQ
 ---
