@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,9 +32,7 @@ namespace SignalR.RabbitMQ
 
         public Task Send(RabbitMqMessageWrapper message)
         {
-            try
-            {
-                if (_channel.IsOpen)
+                if (_channel != null && _channel.IsOpen)
                 {
                    return Task.Factory.StartNew(() => _channel.BasicPublish(_rabbitMqExchangeName,
                                                                             message.Key,
@@ -44,13 +41,6 @@ namespace SignalR.RabbitMQ
                 }
 
                 throw new Exception("RabbitMQ channel is not open.");
-            }
-            catch (Exception exception)
-            {
-                TaskCompletionSource<bool> completionSource = new TaskCompletionSource<bool>();
-                completionSource.SetException(exception);
-                return completionSource.Task;
-            }
         }
 
         public Task StartListening()

@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNet.SignalR;
-using Microsoft.AspNet.SignalR.Messaging;
-using RabbitMQ.Client;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Messaging;
+using RabbitMQ.Client;
 
 namespace SignalR.RabbitMQ
 {
@@ -39,18 +39,11 @@ namespace SignalR.RabbitMQ
             _rabbitConnection.OnMessage( wrapper => OnReceived(wrapper.Key, wrapper.Id, wrapper.Messages));
 
             _rabbitConnectiontask = _rabbitConnection.StartListening();
-            _rabbitConnectiontask.ContinueWith(
-                t =>
-                    {
-                        Interlocked.Exchange(ref _resource, 0);
-                        ConnectToRabbit(connectionfactory, rabbitMqExchangeName);
-                    }
-                );
+
             _rabbitConnectiontask.ContinueWith(
                   t =>
                   {
-                      Interlocked.Exchange(ref _resource, 0);
-                      ConnectToRabbit(connectionfactory, rabbitMqExchangeName);
+                      throw new RabbitMessageBusException("SignalR.RabbitMQ error connecting to RabbitMQ. Please check your RabbitMQ connection.");
                   },
                   CancellationToken.None,
                   TaskContinuationOptions.OnlyOnFaulted,
@@ -64,14 +57,25 @@ namespace SignalR.RabbitMQ
             return Task.Factory.StartNew(msgs =>
             {
                 var messagesToSend = msgs as Message[];
-                messagesToSend.GroupBy(m => m.Source).ToList().ForEach(group =>
+                if (messagesToSend != null)
                 {
-                    var message = new RabbitMqMessageWrapper(group.Key, group.ToArray());
-                    _rabbitConnection.Send(message);
-
-                 });
+                    messagesToSend.GroupBy(m => m.Source).ToList().ForEach(group =>
+                                        {
+                                            var message =
+                                                new RabbitMqMessageWrapper(group.Key, group.ToArray());
+                                            _rabbitConnection.Send(message);
+                                        });
+                }
             },
-            messages);
+            messages).ContinueWith(
+                  t =>
+                  {
+                      throw new RabbitMessageBusException("SignalR.RabbitMQ error sending message. Please check your RabbitMQ connection.");
+                  },
+                  CancellationToken.None,
+                  TaskContinuationOptions.OnlyOnFaulted,
+                  TaskScheduler.Default
+            ); ;
         }
     }
 }

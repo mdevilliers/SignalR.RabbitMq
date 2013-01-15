@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="DependencyResolverExtensions.cs" />
     <Compile Include="RabbitConnection.cs" />
+    <Compile Include="RabbitMessageBusException.cs" />
     <Compile Include="RabbitMqMessageBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RabbitMqMessageWrapper.cs" />
