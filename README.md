@@ -41,7 +41,9 @@ GlobalHost.DependencyResolver.UseRabbitMq(factory, exchangeName);
 
 The SignalR.RabbitMq message bus expects to be handed an instance of a configured ConnectionFactory as produced by the RabbitMq.Client and the name of a message exchange to be used for the signalr messages.
 
-The message bus will then create the exchange if it does not already exist then listen on an anonymous queue for messages across the web farm. There will be one queue per server in the web farm.
+The message bus will then create the exchange if it does not already exist then listen on an anonymous queue for messages across the web farm. There will be one queue per server in the web farm. 
+
+It is recommended that each application should specify its own exchange.
 
 The message exchange should only be used for signalr messages.
 

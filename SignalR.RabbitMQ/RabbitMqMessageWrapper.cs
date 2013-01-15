@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Messaging;
 using Newtonsoft.Json;
 
 namespace SignalR.RabbitMQ

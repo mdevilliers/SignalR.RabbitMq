@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Messaging;
 using RabbitMQ.Client;
 using System.Linq;
 using System.Threading;
@@ -18,7 +19,7 @@ namespace SignalR.RabbitMQ
             ConnectToRabbit( connectionfactory, rabbitMqExchangeName);
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             if(_rabbitConnection != null)
             {

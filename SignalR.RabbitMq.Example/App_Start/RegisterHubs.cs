@@ -1,6 +1,6 @@
+
 using System.Web;
 using System.Web.Routing;
-using Microsoft.AspNet.SignalR;
 
 [assembly: PreApplicationStartMethod(typeof(SignalR.RabbitMq.Example.RegisterHubs), "Start")]
 

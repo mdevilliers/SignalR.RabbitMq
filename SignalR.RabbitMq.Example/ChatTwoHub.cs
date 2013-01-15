@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 
 namespace SignalR.RabbitMq.Example
