@@ -1,24 +1,27 @@
 using System;
-using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
+using EasyNetQ;
+using EasyNetQ.Topology;
 
 namespace SignalR.RabbitMQ
 {
     public class RabbitConnection : IDisposable
     {
-        private readonly ConnectionFactory _rabbitMqConnectionfactory;
-        private readonly string _rabbitMqExchangeName;
-        private IModel _channel;
         private Action<RabbitMqMessageWrapper> _handler;
-        private CancellationTokenSource _cancellationTokenSource;
-        
-        public RabbitConnection(ConnectionFactory connectionfactory, string rabbitMqExchangeName)
-        {
-            _rabbitMqConnectionfactory = connectionfactory;
-            _rabbitMqExchangeName = rabbitMqExchangeName;
+        private readonly IAdvancedBus _bus;
+        private readonly string _applicationName;
+        private readonly IQueue _queue;
+        private readonly IExchange _exchange;
+
+        public RabbitConnection(string ampqConnectionString, string applicationName)
+        {           
+            _bus = RabbitHutch.CreateBus(ampqConnectionString).Advanced;
+
+            _queue = Queue.DeclareTransient();
+            _exchange = Exchange.DeclareTopic(string.Format("{0}-{1}", "RabbitMQ.SignalR",applicationName));
+            _queue.BindTo(_exchange, "#");
+
+            _applicationName = applicationName;
         }
 
         public void OnMessage(Action<RabbitMqMessageWrapper> handler)
@@ -30,68 +33,34 @@ namespace SignalR.RabbitMQ
             _handler= handler;
         }
 
-        public Task Send(RabbitMqMessageWrapper message)
+        public void Send(RabbitMqMessageWrapper message)
         {
-                if (_channel != null && _channel.IsOpen)
+            try
+            {
+                using (var channel = _bus.OpenPublishChannel())
                 {
-                   return Task.Factory.StartNew(() => _channel.BasicPublish(_rabbitMqExchangeName,
-                                                                            message.Key,
-                                                                            null,
-                                                                            message.GetBytes()));
+                    var messageToSend = new Message<RabbitMqMessageWrapper>(message);
+                    channel.Publish<RabbitMqMessageWrapper>(_exchange, string.Empty , messageToSend);
                 }
-
-                throw new Exception("RabbitMQ channel is not open.");
+            }
+            catch (EasyNetQException e)
+            {
+                // the server is not connected
+                throw new RabbitMessageBusException("RabbitMQ channel is not open.", e);
+            }    
         }
 
-        public Task StartListening()
+        public void StartListening()
         {
-            _cancellationTokenSource = new CancellationTokenSource();
-            var token = _cancellationTokenSource.Token;
-
-            var task = Task.Factory.StartNew(() =>
-                        {
-                            var connection = _rabbitMqConnectionfactory.CreateConnection();
-                            _channel = connection.CreateModel();
-                            _channel.ExchangeDeclare(_rabbitMqExchangeName, "topic", true);
-
-                            var queue = _channel.QueueDeclare("", false, false, true, null);
-                            _channel.QueueBind(queue.QueueName, _rabbitMqExchangeName, "#");
-
-                            var consumer = new QueueingBasicConsumer(_channel);
-                            _channel.BasicConsume(queue.QueueName, false, consumer);
-
-                            while (_channel.IsOpen && !token.IsCancellationRequested)
-                            {
-                                try
-                                {
-                                    var ea = (BasicDeliverEventArgs) consumer.Queue.Dequeue();
-                                    _channel.BasicAck(ea.DeliveryTag, false);
-
-                                    Task.Factory.StartNew((handler) =>
-                                                              {
-                                                                  var message =
-                                                                      RabbitMqMessageWrapper.Deserialize(ea.Body);
-
-                                                                  var handlersToInform =
-                                                                      (Action<RabbitMqMessageWrapper>) handler;
-
-                                                                  handlersToInform.Invoke(message);
-                                                                  
-                                                              }, _handler);
-
-                                }catch(EndOfStreamException eose)
-                                {
-                                    //ignore
-                                }
-                            }
-                        },token);
-
-            return task;
+            _bus.Subscribe<RabbitMqMessageWrapper>(_queue, (msg, messageReceivedInfo) =>
+                                                               {
+                                                                   return Task.Factory.StartNew(() => _handler.Invoke(msg.Body));
+                                                               });
         }
 
         public void Dispose()
         {
-            _cancellationTokenSource.Cancel();
+            _bus.Dispose();
         }
     }
 }

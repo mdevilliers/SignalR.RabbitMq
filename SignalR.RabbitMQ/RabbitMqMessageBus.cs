@@ -1,9 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Messaging;
-using RabbitMQ.Client;
 
 namespace SignalR.RabbitMQ
 {
@@ -13,13 +13,23 @@ namespace SignalR.RabbitMQ
         private Task _rabbitConnectiontask;
         private int _resource = 0;
 
-        public RabbitMqMessageBus(IDependencyResolver resolver, ConnectionFactory connectionfactory, string rabbitMqExchangeName)
+        public RabbitMqMessageBus(IDependencyResolver resolver, string ampqConnectionString, string applicationName)
             : base(resolver)
         {
-            ConnectToRabbit( connectionfactory, rabbitMqExchangeName);
+            if (string.IsNullOrEmpty(applicationName))
+            {
+                throw new ArgumentNullException("applicationName");
+            }
+
+            if (string.IsNullOrEmpty(ampqConnectionString))
+            {
+                throw new ArgumentNullException("ampqConnectionString");
+            }
+
+            ConnectToRabbit(ampqConnectionString, applicationName);
         }
 
-        public void Dispose()
+        public new void Dispose()
         {
             if(_rabbitConnection != null)
             {
@@ -28,28 +38,16 @@ namespace SignalR.RabbitMQ
             base.Dispose();
         }
 
-        private void ConnectToRabbit(ConnectionFactory connectionfactory, string rabbitMqExchangeName)
+        private void ConnectToRabbit(string ampqConnectionString, string applicationName)
         {
             if (1 == Interlocked.Exchange(ref _resource, 1))
             {
                 return;
             }
 
-            _rabbitConnection = new RabbitConnection(connectionfactory, rabbitMqExchangeName);
+            _rabbitConnection = new RabbitConnection(ampqConnectionString, applicationName);
             _rabbitConnection.OnMessage( wrapper => OnReceived(wrapper.Key, wrapper.Id, wrapper.Messages));
-
-            _rabbitConnectiontask = _rabbitConnection.StartListening();
-
-            _rabbitConnectiontask.ContinueWith(
-                  t =>
-                  {
-                      throw new RabbitMessageBusException("SignalR.RabbitMQ error connecting to RabbitMQ. Please check your RabbitMQ connection.");
-                  },
-                  CancellationToken.None,
-                  TaskContinuationOptions.OnlyOnFaulted,
-                  TaskScheduler.Default
-            );
-
+            _rabbitConnection.StartListening();
         }
 
         protected override Task Send(Message[] messages)

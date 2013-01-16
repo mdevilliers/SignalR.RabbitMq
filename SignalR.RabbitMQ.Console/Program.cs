@@ -17,8 +17,8 @@ namespace SignalR.RabbitMQ.Console
                 Password = "guest"
             };
 
-            var exchangeName = "SignalRExchange";
-            GlobalHost.DependencyResolver.UseRabbitMq(factory, exchangeName);
+            var applicationName = "signalR:Demo";
+            GlobalHost.DependencyResolver.UseRabbitMq(factory, applicationName);
 
             var hubContext = GlobalHost.ConnectionManager.GetHubContext<Chat>();
 
