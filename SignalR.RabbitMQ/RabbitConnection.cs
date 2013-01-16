@@ -52,10 +52,7 @@ namespace SignalR.RabbitMQ
 
         public void StartListening()
         {
-            _bus.Subscribe<RabbitMqMessageWrapper>(_queue, (msg, messageReceivedInfo) =>
-                                                               {
-                                                                   return Task.Factory.StartNew(() => _handler.Invoke(msg.Body));
-                                                               });
+            _bus.Subscribe<RabbitMqMessageWrapper>(_queue, (msg, messageReceivedInfo) => Task.Factory.StartNew(() => _handler.Invoke(msg.Body)));
         }
 
         public void Dispose()
