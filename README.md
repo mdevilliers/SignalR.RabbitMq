@@ -94,5 +94,5 @@ The message "Hello!" is put onto the message bus and relayed by the web applicat
 FAQ
 ---
 
-The library uses EasyMQ.net as a sane wrapper of the RabbitMQ.Client
+The library uses EasyNetQ as a sane wrapper of the RabbitMQ.Client
 
