@@ -9,7 +9,6 @@ namespace SignalR.RabbitMQ
     {
         private Action<RabbitMqMessageWrapper> _handler;
         private readonly IAdvancedBus _bus;
-        private readonly string _applicationName;
         private readonly IQueue _queue;
         private readonly IExchange _exchange;
 
@@ -20,8 +19,6 @@ namespace SignalR.RabbitMQ
             _queue = Queue.DeclareTransient();
             _exchange = Exchange.DeclareTopic(string.Format("{0}-{1}", "RabbitMQ.SignalR",applicationName));
             _queue.BindTo(_exchange, "#");
-
-            _applicationName = applicationName;
         }
 
         public void OnMessage(Action<RabbitMqMessageWrapper> handler)
@@ -45,7 +42,6 @@ namespace SignalR.RabbitMQ
             }
             catch (EasyNetQException e)
             {
-                // the server is not connected
                 throw new RabbitMessageBusException("RabbitMQ channel is not open.", e);
             }    
         }

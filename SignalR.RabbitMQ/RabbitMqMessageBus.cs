@@ -10,7 +10,6 @@ namespace SignalR.RabbitMQ
     internal class RabbitMqMessageBus : ScaleoutMessageBus
     {
         private RabbitConnection _rabbitConnection;
-        private Task _rabbitConnectiontask;
         private int _resource = 0;
 
         public RabbitMqMessageBus(IDependencyResolver resolver, string ampqConnectionString, string applicationName)

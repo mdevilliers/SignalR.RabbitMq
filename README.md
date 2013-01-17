@@ -6,6 +6,9 @@ About
 SignalR.RabbitMq is an implementation of an IMessageBus using RabbitMq as the backing store and would be used to allow a
 signalr web application to be scaled across a web farm.
 
+Please note the following describes useage of the release built on SignalR 1.0.0-rc2
+--------------------------------------------------------------------------------------
+
 Installation
 ------------
 
@@ -30,20 +33,22 @@ The example web project shows how you could configure the message bus in the glo
 
 ```CSHARP
 var factory = new ConnectionFactory 
-		{ 
-			UserName = "guest",
-			Password = "guest"
-		};
+{ 
+	UserName = "guest",
+	Password = "guest"
+};
 
-var exchangeName = "SignalRExchange";
-GlobalHost.DependencyResolver.UseRabbitMq(factory, exchangeName);
+var applicationName = "Example";
+GlobalHost.DependencyResolver.UseRabbitMq(factory, applicationName);
 ```
 
-The SignalR.RabbitMq message bus expects to be handed an instance of a configured ConnectionFactory as produced by the RabbitMq.Client and the name of a message exchange to be used for the signalr messages.
+The SignalR.RabbitMq message bus expects to be handed either an instance of a configured ConnectionFactory as produced by the RabbitMq.Client or a ampq connection string e.g. "host=myServer;virtualHost=myVirtualHost;username=myusername;password=topsecret"
+
+and the name of a message exchange to be used for the signalr messages.
 
 The message bus will then create the exchange if it does not already exist then listen on an anonymous queue for messages across the web farm. There will be one queue per server in the web farm. 
 
-It is recommended that each application should specify its own exchange.
+It is recommended that each application should specify its own application name.
 
 The message exchange should only be used for signalr messages.
 
@@ -58,15 +63,14 @@ It might be interesting to send messages directly to connected clients from anot
 From the SignalR.RabbitMQ.Console project -
 
 ```CSHARP
-
-var factory = new ConnectionFactory
-{
+var factory = new ConnectionFactory 
+{ 
 	UserName = "guest",
 	Password = "guest"
 };
 
-var exchangeName = "SignalRExchange";
-GlobalHost.DependencyResolver.UseRabbitMq(factory, exchangeName);
+var applicationName = "Example";
+GlobalHost.DependencyResolver.UseRabbitMq(factory, applicationName);
 
 var hubContext = GlobalHost.ConnectionManager.GetHubContext<Chat>();
 
@@ -90,4 +94,5 @@ The message "Hello!" is put onto the message bus and relayed by the web applicat
 FAQ
 ---
 
-The library uses the RabbitMq.Client for better or worse.
+The library uses EasyMQ.net as a sane wrapper of the RabbitMQ.Client
+
