@@ -56,7 +56,7 @@ The message exchange should only be used for signalr messages.
 Send to client via message bus
 ------------------------------
 
-So you have scaled out your message bus and scaled out SignalR something awesome but what next?
+So you have scaled out your SignalR message bus but what next?
 
 It might be interesting to send messages directly to connected clients from another process.
 
