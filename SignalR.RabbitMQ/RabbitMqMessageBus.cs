@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -49,7 +50,7 @@ namespace SignalR.RabbitMQ
             _rabbitConnection.StartListening();
         }
 
-        protected override Task Send(Message[] messages)
+        protected override Task Send(IList<Message> messages)
         {
             return Task.Factory.StartNew(msgs =>
             {

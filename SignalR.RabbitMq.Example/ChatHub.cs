@@ -12,7 +12,7 @@ namespace SignalR.RabbitMq.Example
         public void NotifyJoined()
         {
             Groups.Add(Context.ConnectionId, "ChatClients");
-           // Clients.All.userJoined( Context.ConnectionId);
+            Clients.All.userJoined( Context.ConnectionId);
         }
 
         public override System.Threading.Tasks.Task OnDisconnected()
