@@ -6,8 +6,8 @@ About
 SignalR.RabbitMq is an implementation of an IMessageBus using RabbitMq as the backing store and would be used to allow a
 signalr web application to be scaled across a web farm.
 
-Please note the following describes the release built on SignalR 1.0.0-rc2
---------------------------------------------------------------------------
+Please note the following describes the release built on SignalR 1.0.0
+----------------------------------------------------------------------
 
 Installation
 ------------
@@ -22,8 +22,7 @@ Install-Package SignalR.RabbitMq
 
 To install via the nuget user interface in Visual Studio the package to search for is "SignalR.RabbitMq"
 
-
-Useage
+Usage
 ------
 
 General Usage
@@ -56,9 +55,7 @@ The message exchange should only be used for signalr messages.
 Send to client via message bus
 ------------------------------
 
-So you have scaled out your SignalR message bus but what next?
-
-It might be interesting to send messages directly to connected clients from another process.
+One benefit of using the message bus is to send messages directly to connected clients from another process.
 
 From the SignalR.RabbitMQ.Console project -
 
