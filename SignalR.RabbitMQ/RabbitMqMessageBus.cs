@@ -46,10 +46,15 @@ namespace SignalR.RabbitMQ
             }
 
             _rabbitConnection = new RabbitConnection(ampqConnectionString, applicationName);
-            _rabbitConnection.OnMessage( wrapper => OnReceived(wrapper.Key, wrapper.Id, wrapper.Messages));
+            _rabbitConnection.OnMessage( 
+                wrapper =>
+                    {
+                        OnReceived(wrapper.Key, wrapper.Id, wrapper.Messages);
+                    }
+            );
             _rabbitConnection.StartListening();
         }
-
+        
         protected override Task Send(IList<Message> messages)
         {
             return Task.Factory.StartNew(msgs =>
@@ -65,7 +70,7 @@ namespace SignalR.RabbitMQ
                                         });
                 }
             },
-            messages).ContinueWith(
+            messages.ToArray()).ContinueWith(
                   t =>
                   {
                       throw new RabbitMessageBusException("SignalR.RabbitMQ error sending message. Please check your RabbitMQ connection.");

@@ -5,26 +5,22 @@
 
   
   <input type="text" id="msg" />
-  <input type="button" id="broadcast" value="broadcast" />
+  <a id="broadcast" href="#">Send message</a>
 
 <p>Messages : </p>
 <ul id="messages">  </ul>
-<p>Users : </p>
-  <ul id="users">  </ul>
+
 
 <script type="text/javascript">
     $(function () {
         
         // Proxy created on the fly
         var chat = $.connection.chat;
-
+        $.connection.hub.logging = true;
+        
         // Declare a function on the chat hub so the server can invoke it
         chat.client.addMessage = function (message, from) {
             $('#messages').append('<li>' + message  + " from " + from + '</li>');
-        };
-
-        chat.client.userJoined = function (message) {
-            $('#users').append('<li>' + message + '</li>');
         };
 
         chat.client.onConsoleMessage = function (message) {
@@ -45,9 +41,9 @@
         $("#broadcast").hide();
 
         // Start the connection
-        $.connection.hub.start().done(function () {
+        $.connection.hub.start({transport: 'auto'},function () {
             $("#broadcast").show();
-            chat.server.notifyJoined();
+            console.log("Success");
         });
     });
   </script>
