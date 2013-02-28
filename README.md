@@ -93,3 +93,9 @@ FAQ
 
 The library uses EasyNetQ as a sane wrapper of the RabbitMQ.Client
 
+Contributers
+------------
+
+Thanks to -
+
+[kevingorski](https://github.com/kevingorski)
