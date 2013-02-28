@@ -29,14 +29,15 @@ namespace SignalR.RabbitMQ
             ConnectToRabbit(ampqConnectionString, applicationName);
         }
 
-        public new void Dispose()
-        {
-            if(_rabbitConnection != null)
-            {
-                _rabbitConnection.Dispose();
-            }
-            base.Dispose();
-        }
+		protected override void Dispose(bool disposing)
+		{
+			if (disposing && _rabbitConnection != null)
+			{
+				_rabbitConnection.Dispose();
+			}
+
+			base.Dispose(disposing);
+		}
 
         private void ConnectToRabbit(string ampqConnectionString, string applicationName)
         {
