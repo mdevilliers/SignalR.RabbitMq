@@ -12,12 +12,15 @@ namespace SignalR.RabbitMQ
         private readonly IQueue _queue;
         private readonly IExchange _exchange;
 
-        public RabbitConnection(string ampqConnectionString, string applicationName)
+        public RabbitConnection(string ampqConnectionString, string exchangeName, string queueName)
         {           
             _bus = RabbitHutch.CreateBus(ampqConnectionString).Advanced;
 
-            _queue = Queue.DeclareTransient();
-            _exchange = Exchange.DeclareTopic(string.Format("{0}-{1}", "RabbitMQ.SignalR",applicationName));
+			_exchange = Exchange.DeclareFanout(exchangeName);
+
+			_queue = queueName == null
+				? Queue.DeclareTransient()
+				: Queue.DeclareTransient(queueName);
             _queue.BindTo(_exchange, "#");
         }
 
@@ -37,7 +40,7 @@ namespace SignalR.RabbitMQ
                 using (var channel = _bus.OpenPublishChannel())
                 {
                     var messageToSend = new Message<RabbitMqMessageWrapper>(message);
-                    channel.Publish<RabbitMqMessageWrapper>(_exchange, string.Empty , messageToSend);
+                    channel.Publish<RabbitMqMessageWrapper>(_exchange, string.Empty, messageToSend);
                 }
             }
             catch (EasyNetQException e)

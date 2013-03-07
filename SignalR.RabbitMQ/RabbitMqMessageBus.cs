@@ -13,7 +13,7 @@ namespace SignalR.RabbitMQ
         private RabbitConnection _rabbitConnection;
         private int _resource = 0;
 
-        public RabbitMqMessageBus(IDependencyResolver resolver, string ampqConnectionString, string applicationName)
+        public RabbitMqMessageBus(IDependencyResolver resolver, string ampqConnectionString, string applicationName, string queueName)
             : base(resolver)
         {
             if (string.IsNullOrEmpty(applicationName))
@@ -26,7 +26,7 @@ namespace SignalR.RabbitMQ
                 throw new ArgumentNullException("ampqConnectionString");
             }
 
-            ConnectToRabbit(ampqConnectionString, applicationName);
+            ConnectToRabbit(ampqConnectionString, applicationName, queueName);
         }
 
 		protected override void Dispose(bool disposing)
@@ -39,14 +39,14 @@ namespace SignalR.RabbitMQ
 			base.Dispose(disposing);
 		}
 
-        private void ConnectToRabbit(string ampqConnectionString, string applicationName)
+        private void ConnectToRabbit(string ampqConnectionString, string applicationName, string queueName)
         {
             if (1 == Interlocked.Exchange(ref _resource, 1))
             {
                 return;
             }
 
-            _rabbitConnection = new RabbitConnection(ampqConnectionString, applicationName);
+            _rabbitConnection = new RabbitConnection(ampqConnectionString, applicationName, queueName);
             _rabbitConnection.OnMessage( 
                 wrapper =>
                     {
