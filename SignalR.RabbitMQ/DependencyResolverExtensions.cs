@@ -7,11 +7,11 @@ namespace SignalR.RabbitMQ
 {
     public static class DependencyResolverExtensions
     {
-        public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, string ampqConnectionString, string applicationName)
+		public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, string ampqConnectionString, string exchangeName, string queueName = null)
         {
-            if (string.IsNullOrEmpty(applicationName))
+            if (string.IsNullOrEmpty(exchangeName))
             {
-                throw new ArgumentNullException("applicationName");
+                throw new ArgumentNullException("exchangeName");
             }
 
             if (string.IsNullOrEmpty(ampqConnectionString))
@@ -19,17 +19,18 @@ namespace SignalR.RabbitMQ
                 throw new ArgumentNullException("ampqConnectionString");
             }
 
-            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, ampqConnectionString, applicationName));
+            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, ampqConnectionString, exchangeName, queueName));
+
             resolver.Register(typeof(IMessageBus), () => bus.Value);
 
             return resolver;
         }
 
-        public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, ConnectionFactory connectionfactory, string applicationName)
+		public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, ConnectionFactory connectionfactory, string exchangeName, string queueName = null)
         {
-            if (string.IsNullOrEmpty(applicationName))
+            if (string.IsNullOrEmpty(exchangeName))
             {
-                throw new ArgumentNullException("applicationName");
+                throw new ArgumentNullException("exchangeName");
             }
 
             if (connectionfactory == null)
@@ -38,8 +39,8 @@ namespace SignalR.RabbitMQ
             }
 
             var ampqConnectionString = string.Format("host={0};virtualHost={1};username={2};password={3};requestedHeartbeat=10", connectionfactory.HostName, connectionfactory.VirtualHost, connectionfactory.UserName, connectionfactory.Password);
+            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, ampqConnectionString, exchangeName, queueName));
 
-            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, ampqConnectionString, applicationName));
             resolver.Register(typeof(IMessageBus), () => bus.Value);
 
             return resolver;
