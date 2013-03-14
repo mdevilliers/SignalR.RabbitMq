@@ -6,8 +6,10 @@ About
 SignalR.RabbitMq is an implementation of an IMessageBus using RabbitMq as the backing store and would be used to allow a
 signalr web application to be scaled across a web farm.
 
-Please note the following describes the release built on SignalR 1.0.0
-----------------------------------------------------------------------
+
+Do not use in production until SignalR 1.1.0 is released and we have upgraded
+-----------------------------------------------------------------------------
+
 
 Installation
 ------------
