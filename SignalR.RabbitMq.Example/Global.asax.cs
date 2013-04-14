@@ -58,8 +58,9 @@ namespace SignalR.RabbitMq.Example
                 Password = "guest"
             };
 
-            var applicationName = "Example";
-            GlobalHost.DependencyResolver.UseRabbitMq(factory, applicationName);
+            var exchangeName = "SignalR.RabbitMQ-Example";
+            GlobalHost.DependencyResolver.UseRabbitMq(factory, exchangeName);
+
         }
     }
 }

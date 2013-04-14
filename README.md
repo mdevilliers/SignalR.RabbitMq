@@ -39,8 +39,9 @@ var factory = new ConnectionFactory
 	Password = "guest"
 };
 
-var applicationName = "Example";
-GlobalHost.DependencyResolver.UseRabbitMq(factory, applicationName);
+
+var exchangeName = "SignalR.RabbitMQ-Example";
+GlobalHost.DependencyResolver.UseRabbitMq(factory, exchangeName);
 ```
 
 The SignalR.RabbitMq message bus expects to be handed either an instance of a configured ConnectionFactory as produced by the RabbitMq.Client or a ampq connection string e.g. "host=myServer;virtualHost=myVirtualHost;username=myusername;password=topsecret"
@@ -68,8 +69,8 @@ var factory = new ConnectionFactory
 	Password = "guest"
 };
 
-var applicationName = "Example";
-GlobalHost.DependencyResolver.UseRabbitMq(factory, applicationName);
+var exchangeName = "SignalR.RabbitMQ-Example";
+GlobalHost.DependencyResolver.UseRabbitMq(factory, exchangeName);
 
 var hubContext = GlobalHost.ConnectionManager.GetHubContext<Chat>();
 
