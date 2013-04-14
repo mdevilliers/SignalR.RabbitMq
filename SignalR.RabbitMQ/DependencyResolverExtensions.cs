@@ -1,4 +1,5 @@
 ﻿using System;
+using EasyNetQ;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Messaging;
 using RabbitMQ.Client;
@@ -7,19 +8,23 @@ namespace SignalR.RabbitMQ
 {
     public static class DependencyResolverExtensions
     {
-		public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, string ampqConnectionString, string exchangeName, string queueName = null)
+        public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, RabbitMqScaleoutConfiguration configuration)
         {
-            if (string.IsNullOrEmpty(exchangeName))
+            if(configuration == null)
             {
-                throw new ArgumentNullException("exchangeName");
+                throw new ArgumentNullException("configuration");
             }
 
-            if (string.IsNullOrEmpty(ampqConnectionString))
-            {
-                throw new ArgumentNullException("ampqConnectionString");
-            }
+            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, configuration));
+            resolver.Register(typeof(IMessageBus), () => bus.Value);
 
-            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, ampqConnectionString, exchangeName, queueName));
+            return resolver;
+        }
+
+		public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, string ampqConnectionString, string exchangeName, string queueName = null)
+		{
+		    var configuration = new RabbitMqScaleoutConfiguration(ampqConnectionString, exchangeName, queueName);
+            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, configuration));
 
             resolver.Register(typeof(IMessageBus), () => bus.Value);
 
@@ -28,18 +33,8 @@ namespace SignalR.RabbitMQ
 
 		public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, ConnectionFactory connectionfactory, string exchangeName, string queueName = null)
         {
-            if (string.IsNullOrEmpty(exchangeName))
-            {
-                throw new ArgumentNullException("exchangeName");
-            }
-
-            if (connectionfactory == null)
-            {
-                throw new ArgumentNullException("connectionfactory");
-            }
-
-            var ampqConnectionString = string.Format("host={0};virtualHost={1};username={2};password={3};requestedHeartbeat=10", connectionfactory.HostName, connectionfactory.VirtualHost, connectionfactory.UserName, connectionfactory.Password);
-            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, ampqConnectionString, exchangeName, queueName));
+            var configuration = new RabbitMqScaleoutConfiguration(connectionfactory, exchangeName, queueName);
+            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, configuration));
 
             resolver.Register(typeof(IMessageBus), () => bus.Value);
 

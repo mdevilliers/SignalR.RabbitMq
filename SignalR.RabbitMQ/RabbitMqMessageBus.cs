@@ -13,20 +13,15 @@ namespace SignalR.RabbitMQ
         private RabbitConnection _rabbitConnection;
         private int _resource = 0;
 
-        public RabbitMqMessageBus(IDependencyResolver resolver, string ampqConnectionString, string applicationName, string queueName)
-            : base(resolver)
+        public RabbitMqMessageBus(IDependencyResolver resolver, RabbitMqScaleoutConfiguration configuration)
+            : base(resolver, configuration)
         {
-            if (string.IsNullOrEmpty(applicationName))
+            if (configuration == null)
             {
-                throw new ArgumentNullException("applicationName");
+                throw new ArgumentNullException("configuration");
             }
 
-            if (string.IsNullOrEmpty(ampqConnectionString))
-            {
-                throw new ArgumentNullException("ampqConnectionString");
-            }
-
-            ConnectToRabbit(ampqConnectionString, applicationName, queueName);
+            ConnectToRabbit(configuration);
         }
 
 		protected override void Dispose(bool disposing)
@@ -39,21 +34,22 @@ namespace SignalR.RabbitMQ
 			base.Dispose(disposing);
 		}
 
-        private void ConnectToRabbit(string ampqConnectionString, string applicationName, string queueName)
+        private void ConnectToRabbit(RabbitMqScaleoutConfiguration configuration)
         {
             if (1 == Interlocked.Exchange(ref _resource, 1))
             {
                 return;
             }
 
-            _rabbitConnection = new RabbitConnection(ampqConnectionString, applicationName, queueName);
+            _rabbitConnection = new RabbitConnection(configuration);
             _rabbitConnection.OnMessage( 
                 wrapper =>
                     {
-                        OnReceived(wrapper.Key, wrapper.Id, wrapper.Messages);
+                        OnReceived(0, wrapper.Id, wrapper.Messages);
                     }
             );
             _rabbitConnection.StartListening();
+            Open(0); 
         }
         
         protected override Task Send(IList<Message> messages)

@@ -12,15 +12,16 @@ namespace SignalR.RabbitMQ
         private readonly IQueue _queue;
         private readonly IExchange _exchange;
 
-        public RabbitConnection(string ampqConnectionString, string exchangeName, string queueName)
-        {           
-            _bus = RabbitHutch.CreateBus(ampqConnectionString).Advanced;
+        public RabbitConnection(RabbitMqScaleoutConfiguration configuration)
+        {
+            _bus = RabbitHutch.CreateBus(configuration.AmpqConnectionString).Advanced;
+            
+			_exchange = Exchange.DeclareFanout(configuration.ExchangeName);
 
-			_exchange = Exchange.DeclareFanout(exchangeName);
-
-			_queue = queueName == null
+			_queue = configuration.QueueName == null
 				? Queue.DeclareTransient()
-				: Queue.DeclareTransient(queueName);
+                : Queue.DeclareTransient(configuration.QueueName);
+
             _queue.BindTo(_exchange, "#");
         }
 
@@ -51,7 +52,12 @@ namespace SignalR.RabbitMQ
 
         public void StartListening()
         {
-            _bus.Subscribe<RabbitMqMessageWrapper>(_queue, (msg, messageReceivedInfo) => Task.Factory.StartNew(() => _handler.Invoke(msg.Body)));
+            _bus.Subscribe<RabbitMqMessageWrapper>(_queue,
+                (msg, messageReceivedInfo) =>
+                    Task.Factory.StartNew(() =>
+                                              {
+                                                  _handler.Invoke(msg.Body);
+                                              }));
         }
 
         public void Dispose()
