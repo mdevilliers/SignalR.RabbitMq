@@ -24,21 +24,13 @@ namespace SignalR.RabbitMQ
 		public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, string ampqConnectionString, string exchangeName, string queueName = null)
 		{
 		    var configuration = new RabbitMqScaleoutConfiguration(ampqConnectionString, exchangeName, queueName);
-            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, configuration));
-
-            resolver.Register(typeof(IMessageBus), () => bus.Value);
-
-            return resolver;
+            return UseRabbitMq(resolver, configuration);
         }
 
 		public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, ConnectionFactory connectionfactory, string exchangeName, string queueName = null)
         {
             var configuration = new RabbitMqScaleoutConfiguration(connectionfactory, exchangeName, queueName);
-            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, configuration));
-
-            resolver.Register(typeof(IMessageBus), () => bus.Value);
-
-            return resolver;
+            return UseRabbitMq(resolver, configuration);
         }
     }
 }
