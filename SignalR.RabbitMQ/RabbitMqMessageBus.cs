@@ -57,15 +57,8 @@ namespace SignalR.RabbitMQ
             return Task.Factory.StartNew(msgs =>
             {
                 var messagesToSend = msgs as Message[];
-                if (messagesToSend != null)
-                {
-                    messagesToSend.GroupBy(m => m.Source).ToList().ForEach(group =>
-                                        {
-                                            var message =
-                                                new RabbitMqMessageWrapper(group.Key, group.ToArray());
-                                            _rabbitConnection.Send(message);
-                                        });
-                }
+                var message = new RabbitMqMessageWrapper(messagesToSend);
+                _rabbitConnection.Send(message);
             },
             messages.ToArray()).ContinueWith(
                   t =>

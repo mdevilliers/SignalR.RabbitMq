@@ -9,40 +9,46 @@ namespace SignalR.RabbitMQ
     [Serializable]
     public class RabbitMqMessageWrapper
     {
-        public RabbitMqMessageWrapper(string key, Message[] messages)
+        public RabbitMqMessageWrapper(Message[] messages)
         {
             Id = GetNext();
-            Key = key;
             Messages = messages;
         }
 
         public ulong Id { get; set; }
-        public string Key { get; set; }
         public byte[] Bytes { get; set; }
+
+        [NonSerialized]
+        [JsonIgnore]
+        private Message[] _messages;
 
         [JsonIgnore]
         public Message[] Messages { 
             get
             {
-                using (var stream = new MemoryStream(Bytes))
+                if (_messages == null)
                 {
-                    var binaryReader = new BinaryReader(stream);
-                    
-                    var messages = new List<Message>();
-                    int count = binaryReader.ReadInt32();
-                    
-                    for (int i = 0; i < count; i++)
+                    using (var stream = new MemoryStream(Bytes))
                     {
-                        messages.Add(Message.ReadFrom(stream));
-                    }
+                        var binaryReader = new BinaryReader(stream);
+                        var messages = new List<Message>();
+                        int count = binaryReader.ReadInt32();
 
-                    return messages.ToArray();
-                }  
+                        for (int i = 0; i < count; i++)
+                        {
+                            messages.Add(Message.ReadFrom(stream));
+                        }
+
+                        _messages = messages.ToArray();
+                    }
+                }
+                return _messages;
             }
             set
             {
                 if (value != null)
                 {
+                    _messages = value;
                     using (var ms = new MemoryStream())
                     {
                         var binaryWriter = new BinaryWriter(ms);
@@ -56,6 +62,7 @@ namespace SignalR.RabbitMQ
                         Bytes = ms.ToArray();
                     }
                 }
+                
             }
         }
 
