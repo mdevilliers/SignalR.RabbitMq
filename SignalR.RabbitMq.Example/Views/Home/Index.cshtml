@@ -20,11 +20,11 @@
         
         // Declare a function on the chat hub so the server can invoke it
         chat.client.addMessage = function (message, from) {
-            $('#messages').append('<li>' + message  + " from " + from + '</li>');
+            $('#messages').prepend('<li>' + message  + " from " + from + '</li>');
         };
 
         chat.client.onConsoleMessage = function (message) {
-            $('#messages').append('<li> From the console application : ' + message + '</li>');
+            $('#messages').prepend('<li> From the console application : ' + message + '</li>');
         };
 
         $("#broadcast").click(function () {
