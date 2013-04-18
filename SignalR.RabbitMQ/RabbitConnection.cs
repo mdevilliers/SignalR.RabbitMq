@@ -9,20 +9,17 @@ namespace SignalR.RabbitMQ
     {
         private Action<RabbitMqMessageWrapper> _handler;
         private readonly IAdvancedBus _bus;
-        private readonly IQueue _queue;
-        private readonly IExchange _exchange;
+        private readonly RabbitMqScaleoutConfiguration _configuration;
+        private IQueue _queue;
+        private IExchange _exchange;
 
-        public RabbitConnection(RabbitMqScaleoutConfiguration configuration)
+        public RabbitConnection(RabbitMqScaleoutConfiguration configuration, Action onConnectionAction, Action onDisconnectionAction)
         {
+            _configuration = configuration;
             _bus = RabbitHutch.CreateBus(configuration.AmpqConnectionString).Advanced;
-            
-			_exchange = Exchange.DeclareFanout(configuration.ExchangeName);
 
-			_queue = configuration.QueueName == null
-				? Queue.DeclareTransient()
-                : Queue.DeclareTransient(configuration.QueueName);
-
-            _queue.BindTo(_exchange, "#");
+            _bus.Connected += onConnectionAction;
+            _bus.Disconnected += onDisconnectionAction; 
         }
 
         public void OnMessage(Action<RabbitMqMessageWrapper> handler)
@@ -36,28 +33,25 @@ namespace SignalR.RabbitMQ
 
         public void Send(RabbitMqMessageWrapper message)
         {
-            try
+            using (var channel = _bus.OpenPublishChannel())
             {
-                using (var channel = _bus.OpenPublishChannel())
-                {
-                    var messageToSend = new Message<RabbitMqMessageWrapper>(message);
-                    channel.Publish<RabbitMqMessageWrapper>(_exchange, string.Empty, messageToSend);
-                }
-            }
-            catch (EasyNetQException e)
-            {
-                throw new RabbitMessageBusException("RabbitMQ channel is not open.", e);
-            }    
+                var messageToSend = new Message<RabbitMqMessageWrapper>(message);
+                channel.Publish<RabbitMqMessageWrapper>(_exchange, string.Empty, messageToSend);
+            }   
         }
 
         public void StartListening()
         {
+            _exchange = Exchange.DeclareFanout(_configuration.ExchangeName);
+
+            _queue = _configuration.QueueName == null
+                ? Queue.DeclareTransient()
+                : Queue.DeclareTransient(_configuration.QueueName);
+
+            _queue.BindTo(_exchange, "#");
             _bus.Subscribe<RabbitMqMessageWrapper>(_queue,
                 (msg, messageReceivedInfo) =>
-                    Task.Factory.StartNew(() =>
-                                              {
-                                                  _handler.Invoke(msg.Body);
-                                              }));
+                    Task.Factory.StartNew(() => _handler.Invoke(msg.Body)));
         }
 
         public void Dispose()

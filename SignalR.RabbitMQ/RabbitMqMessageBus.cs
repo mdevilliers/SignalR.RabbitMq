@@ -10,7 +10,8 @@ namespace SignalR.RabbitMQ
 {
     internal class RabbitMqMessageBus : ScaleoutMessageBus
     {
-        private RabbitConnection _rabbitConnection;
+        private readonly RabbitConnection _rabbitConnection;
+        private readonly RabbitMqScaleoutConfiguration _configuration;
         private int _resource = 0;
 
         public RabbitMqMessageBus(IDependencyResolver resolver, RabbitMqScaleoutConfiguration configuration)
@@ -20,8 +21,11 @@ namespace SignalR.RabbitMQ
             {
                 throw new ArgumentNullException("configuration");
             }
+            _configuration = configuration;
+            _rabbitConnection = new RabbitConnection(_configuration, ConnectToRabbit , OnConnectionLost);
+            _rabbitConnection.OnMessage( wrapper => OnReceived(0, wrapper.Id, wrapper.Messages));
 
-            ConnectToRabbit(configuration);
+            ConnectToRabbit();
         }
 
 		protected override void Dispose(bool disposing)
@@ -34,20 +38,18 @@ namespace SignalR.RabbitMQ
 			base.Dispose(disposing);
 		}
 
-        private void ConnectToRabbit(RabbitMqScaleoutConfiguration configuration)
+        protected void OnConnectionLost()
+        {
+            Interlocked.Exchange(ref _resource, 0);
+            OnError(0, new RabbitMessageBusException("Connection to Rabbit lost."));
+        }
+
+        protected void ConnectToRabbit()
         {
             if (1 == Interlocked.Exchange(ref _resource, 1))
             {
                 return;
             }
-
-            _rabbitConnection = new RabbitConnection(configuration);
-            _rabbitConnection.OnMessage( 
-                wrapper =>
-                    {
-                        OnReceived(0, wrapper.Id, wrapper.Messages);
-                    }
-            );
             _rabbitConnection.StartListening();
             Open(0); 
         }
@@ -55,20 +57,19 @@ namespace SignalR.RabbitMQ
         protected override Task Send(IList<Message> messages)
         {
             return Task.Factory.StartNew(msgs =>
-            {
-                var messagesToSend = msgs as Message[];
-                var message = new RabbitMqMessageWrapper(messagesToSend);
-                _rabbitConnection.Send(message);
-            },
-            messages.ToArray()).ContinueWith(
-                  t =>
-                  {
-                      throw new RabbitMessageBusException("SignalR.RabbitMQ error sending message. Please check your RabbitMQ connection.");
-                  },
-                  CancellationToken.None,
-                  TaskContinuationOptions.OnlyOnFaulted,
-                  TaskScheduler.Default
-            ); ;
+                        {
+                            try
+                            {
+                                var messagesToSend = msgs as Message[];
+                                var message = new RabbitMqMessageWrapper(messagesToSend);
+                                _rabbitConnection.Send(message);
+                            }
+                            catch
+                            {
+                                OnConnectionLost();
+                            }
+                        },
+                    messages.ToArray());
         }
     }
 }
