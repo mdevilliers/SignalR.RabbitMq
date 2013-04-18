@@ -4,7 +4,7 @@ using EasyNetQ.Topology;
 
 namespace SignalR.RabbitMQ
 {
-    public class EasyNetQRabbitConnection : RabbitConnectionBase
+    internal class EasyNetQRabbitConnection : RabbitConnectionBase
     {
         private readonly IAdvancedBus _bus;   
         private IQueue _queue;

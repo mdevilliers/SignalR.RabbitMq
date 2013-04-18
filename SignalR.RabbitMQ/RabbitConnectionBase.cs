@@ -14,10 +14,10 @@ namespace SignalR.RabbitMQ
             Configuration = configuration;
         }
 
-        protected internal Action OnReconnectionAction { get; set; }
-        protected internal Action OnDisconnectionAction { get; set; }
-        protected internal RabbitMqScaleoutConfiguration Configuration { get; set; }
-        protected internal Action<RabbitMqMessageWrapper> OnMessageRecieved { get; set; }
+        internal Action OnReconnectionAction { get; set; }
+        internal Action OnDisconnectionAction { get; set; }
+        internal RabbitMqScaleoutConfiguration Configuration { get; set; }
+        internal Action<RabbitMqMessageWrapper> OnMessageRecieved { get; set; }
 
         public virtual void Dispose()
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-using EasyNetQ;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Messaging;
 using RabbitMQ.Client;
