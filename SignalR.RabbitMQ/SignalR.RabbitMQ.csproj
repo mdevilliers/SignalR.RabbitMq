@@ -56,8 +56,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RabbitConnectionBase.cs" />
     <Compile Include="DependencyResolverExtensions.cs" />
-    <Compile Include="RabbitConnection.cs" />
+    <Compile Include="EasyNetQRabbitConnectionBase.cs" />
     <Compile Include="RabbitMessageBusException.cs" />
     <Compile Include="RabbitMqMessageBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

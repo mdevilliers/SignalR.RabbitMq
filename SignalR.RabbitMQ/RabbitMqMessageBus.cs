@@ -10,7 +10,7 @@ namespace SignalR.RabbitMQ
 {
     internal class RabbitMqMessageBus : ScaleoutMessageBus
     {
-        private readonly RabbitConnection _rabbitConnection;
+        private readonly RabbitConnectionBase _rabbitConnectionBase;
         private readonly RabbitMqScaleoutConfiguration _configuration;
         private int _resource = 0;
 
@@ -22,17 +22,21 @@ namespace SignalR.RabbitMQ
                 throw new ArgumentNullException("configuration");
             }
             _configuration = configuration;
-            _rabbitConnection = new RabbitConnection(_configuration, ConnectToRabbit , OnConnectionLost);
-            _rabbitConnection.OnMessage( wrapper => OnReceived(0, wrapper.Id, wrapper.Messages));
+            _rabbitConnectionBase = new EasyNetQRabbitConnectionBase(_configuration )
+                                    {
+                                        OnDisconnectionAction = OnConnectionLost,
+                                        OnReconnectionAction = ConnectToRabbit,
+                                        OnMessageRecieved =  wrapper => OnReceived(0, wrapper.Id, wrapper.Messages)
+                                    };
 
             ConnectToRabbit();
         }
 
 		protected override void Dispose(bool disposing)
 		{
-			if (disposing && _rabbitConnection != null)
+			if (disposing && _rabbitConnectionBase != null)
 			{
-				_rabbitConnection.Dispose();
+				_rabbitConnectionBase.Dispose();
 			}
 
 			base.Dispose(disposing);
@@ -50,7 +54,7 @@ namespace SignalR.RabbitMQ
             {
                 return;
             }
-            _rabbitConnection.StartListening();
+            _rabbitConnectionBase.StartListening();
             Open(0); 
         }
         
@@ -62,7 +66,7 @@ namespace SignalR.RabbitMQ
                             {
                                 var messagesToSend = msgs as Message[];
                                 var message = new RabbitMqMessageWrapper(messagesToSend);
-                                _rabbitConnection.Send(message);
+                                _rabbitConnectionBase.Send(message);
                             }
                             catch
                             {
