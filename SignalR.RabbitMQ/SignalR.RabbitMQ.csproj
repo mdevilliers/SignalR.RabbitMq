@@ -58,7 +58,7 @@
   <ItemGroup>
     <Compile Include="RabbitConnectionBase.cs" />
     <Compile Include="DependencyResolverExtensions.cs" />
-    <Compile Include="EasyNetQRabbitConnectionBase.cs" />
+    <Compile Include="EasyNetQRabbitConnection.cs" />
     <Compile Include="RabbitMessageBusException.cs" />
     <Compile Include="RabbitMqMessageBus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

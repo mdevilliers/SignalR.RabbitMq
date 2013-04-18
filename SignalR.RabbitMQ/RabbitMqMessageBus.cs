@@ -22,7 +22,7 @@ namespace SignalR.RabbitMQ
                 throw new ArgumentNullException("configuration");
             }
             _configuration = configuration;
-            _rabbitConnectionBase = new EasyNetQRabbitConnectionBase(_configuration )
+            _rabbitConnectionBase = new EasyNetQRabbitConnection(_configuration )
                                     {
                                         OnDisconnectionAction = OnConnectionLost,
                                         OnReconnectionAction = ConnectToRabbit,

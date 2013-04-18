@@ -4,13 +4,13 @@ using EasyNetQ.Topology;
 
 namespace SignalR.RabbitMQ
 {
-    public class EasyNetQRabbitConnectionBase : RabbitConnectionBase
+    public class EasyNetQRabbitConnection : RabbitConnectionBase
     {
         private readonly IAdvancedBus _bus;   
         private IQueue _queue;
         private IExchange _exchange;
 
-        public EasyNetQRabbitConnectionBase(RabbitMqScaleoutConfiguration configuration) 
+        public EasyNetQRabbitConnection(RabbitMqScaleoutConfiguration configuration) 
             : base(configuration)
         {
             _bus = RabbitHutch.CreateBus(configuration.AmpqConnectionString).Advanced;
