@@ -20,16 +20,17 @@ namespace SignalR.RabbitMQ
             return resolver;
         }
 
-		public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, string ampqConnectionString, string exchangeName, string queueName = null)
-		{
-		    var configuration = new RabbitMqScaleoutConfiguration(ampqConnectionString, exchangeName, queueName);
-            return UseRabbitMq(resolver, configuration);
-        }
-
-		public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, ConnectionFactory connectionfactory, string exchangeName, string queueName = null)
+        public static IDependencyResolver UseRabbitMqAdvanced(this IDependencyResolver resolver, RabbitConnectionBase myConnection, RabbitMqScaleoutConfiguration configuration)
         {
-            var configuration = new RabbitMqScaleoutConfiguration(connectionfactory, exchangeName, queueName);
-            return UseRabbitMq(resolver, configuration);
+            if (configuration == null)
+            {
+                throw new ArgumentNullException("configuration");
+            }
+
+            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, configuration, myConnection));
+            resolver.Register(typeof(IMessageBus), () => bus.Value);
+
+            return resolver;
         }
     }
 }

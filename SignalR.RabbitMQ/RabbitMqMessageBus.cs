@@ -14,7 +14,7 @@ namespace SignalR.RabbitMQ
         private readonly RabbitMqScaleoutConfiguration _configuration;
         private int _resource = 0;
 
-        public RabbitMqMessageBus(IDependencyResolver resolver, RabbitMqScaleoutConfiguration configuration)
+        public RabbitMqMessageBus(IDependencyResolver resolver, RabbitMqScaleoutConfiguration configuration, RabbitConnectionBase advancedConnectionInstance = null)
             : base(resolver, configuration)
         {
             if (configuration == null)
@@ -22,13 +22,21 @@ namespace SignalR.RabbitMQ
                 throw new ArgumentNullException("configuration");
             }
             _configuration = configuration;
-            _rabbitConnectionBase = new EasyNetQRabbitConnection(_configuration )
-                                    {
-                                        OnDisconnectionAction = OnConnectionLost,
-                                        OnReconnectionAction = ConnectToRabbit,
-                                        OnMessageRecieved =  wrapper => OnReceived(0, wrapper.Id, wrapper.Messages)
-                                    };
 
+            if (advancedConnectionInstance != null)
+            {
+                _rabbitConnectionBase = advancedConnectionInstance;
+            }
+            else
+            {
+                _rabbitConnectionBase = new EasyNetQRabbitConnection(_configuration)
+                                            {
+                                                OnDisconnectionAction = OnConnectionLost,
+                                                OnReconnectionAction = ConnectToRabbit,
+                                                OnMessageRecieved =
+                                                    wrapper => OnReceived(0, wrapper.Id, wrapper.Messages)
+                                            };
+            }
             ConnectToRabbit();
         }
 

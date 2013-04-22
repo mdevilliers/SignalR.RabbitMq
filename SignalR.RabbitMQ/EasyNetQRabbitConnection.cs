@@ -14,7 +14,10 @@ namespace SignalR.RabbitMQ
             : base(configuration)
         {
             _bus = RabbitHutch.CreateBus(configuration.AmpqConnectionString).Advanced;
+            //wire up the reconnection handler
             _bus.Connected += OnReconnection;
+
+            //wire up the disconnection handler
             _bus.Disconnected += OnDisconnection;
         }
 

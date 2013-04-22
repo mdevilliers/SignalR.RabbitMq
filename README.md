@@ -6,11 +6,6 @@ About
 SignalR.RabbitMq is an implementation of an IMessageBus using RabbitMq as the backing store and would be used to allow a
 signalr web application to be scaled across a web farm.
 
-
-Do not use in production until SignalR 1.1.0 is released and we have upgraded
------------------------------------------------------------------------------
-
-
 Installation
 ------------
 
@@ -41,7 +36,10 @@ var factory = new ConnectionFactory
 
 
 var exchangeName = "SignalR.RabbitMQ-Example";
-GlobalHost.DependencyResolver.UseRabbitMq(factory, exchangeName);
+
+var configuration = new RabbitMqScaleoutConfiguration(factory, exchangeName);
+GlobalHost.DependencyResolver.UseRabbitMq(configuration); ;
+
 ```
 
 The SignalR.RabbitMq message bus expects to be handed either an instance of a configured ConnectionFactory as produced by the RabbitMq.Client or a ampq connection string e.g. "host=myServer;virtualHost=myVirtualHost;username=myusername;password=topsecret"
@@ -70,7 +68,9 @@ var factory = new ConnectionFactory
 };
 
 var exchangeName = "SignalR.RabbitMQ-Example";
-GlobalHost.DependencyResolver.UseRabbitMq(factory, exchangeName);
+
+var configuration = new RabbitMqScaleoutConfiguration(factory, exchangeName);
+GlobalHost.DependencyResolver.UseRabbitMq(configuration); ;
 
 var hubContext = GlobalHost.ConnectionManager.GetHubContext<Chat>();
 
@@ -90,6 +90,12 @@ Task.Factory.StartNew(
 The onConsoleMessage method is a javascript function on the client.
 The message "Hello!" is put onto the message bus and relayed by the web application to the connected clients.
 
+Advanced
+--------
+
+Everyone likes to be in control so if you have a specific requirements on connecting to RabbitMQ or if you need to audit connections, messages you can supply your own class that extends RabbitConnectionBase.
+
+Please see the implemntation of EasyNetQRabbitConnection for details.
 
 FAQ
 ---
