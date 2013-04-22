@@ -70,7 +70,7 @@ var factory = new ConnectionFactory
 var exchangeName = "SignalR.RabbitMQ-Example";
 
 var configuration = new RabbitMqScaleoutConfiguration(factory, exchangeName);
-GlobalHost.DependencyResolver.UseRabbitMq(configuration); ;
+GlobalHost.DependencyResolver.UseRabbitMq(configuration);
 
 var hubContext = GlobalHost.ConnectionManager.GetHubContext<Chat>();
 
@@ -93,9 +93,9 @@ The message "Hello!" is put onto the message bus and relayed by the web applicat
 Advanced
 --------
 
-Everyone likes to be in control so if you have a specific requirements on connecting to RabbitMQ or if you need to audit connections, messages you can supply your own class that extends RabbitConnectionBase.
+Everyone likes to be in control so if you have a specific requirements on connecting to RabbitMQ or if you need to audit connections or messages you can supply your own class that extends RabbitConnectionBase.
 
-Please see the implemntation of EasyNetQRabbitConnection for details.
+Please see the implementation of EasyNetQRabbitConnection for details.
 
 FAQ
 ---
