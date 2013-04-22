@@ -42,9 +42,8 @@ GlobalHost.DependencyResolver.UseRabbitMq(configuration); ;
 
 ```
 
-The SignalR.RabbitMq message bus expects to be handed either an instance of a configured ConnectionFactory as produced by the RabbitMq.Client or a ampq connection string e.g. "host=myServer;virtualHost=myVirtualHost;username=myusername;password=topsecret"
 
-and the name of a message exchange to be used for the signalr messages.
+The SignalR.RabbitMq message bus expects to be handed a RabbitMqScaleoutConfiguration configured with either an instance of a configured ConnectionFactory as produced by the RabbitMq.Client or a ampq connection string e.g. "host=myServer;virtualHost=myVirtualHost;username=myusername;password=topsecret" and the name of a message exchange to be used for the signalr messages.
 
 The message bus will then create the exchange if it does not already exist then listen on an anonymous queue for messages across the web farm. There will be one queue per server in the web farm. 
 
@@ -95,7 +94,13 @@ Advanced
 
 Everyone likes to be in control so if you have a specific requirements on connecting to RabbitMQ or if you need to audit connections or messages you can supply your own class that extends RabbitConnectionBase.
 
-Please see the implementation of EasyNetQRabbitConnection for details.
+Your class can then be wired up using the other overload -
+
+```CSHARP
+GlobalHost.DependencyResolver.UseRabbitMqAdvanced(...);
+```
+
+Please see the implementation of EasyNetQRabbitConnection for an example implementation.
 
 FAQ
 ---
