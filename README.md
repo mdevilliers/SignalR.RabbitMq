@@ -3,7 +3,7 @@ SignalR.RabbitMq
 
 About
 -----
-SignalR.RabbitMq is an implementation of an IMessageBus using RabbitMq as the backing store and would be used to allow a
+SignalR.RabbitMq is an implementation of an ScaleOutMessageBus using RabbitMq as the backing store and would be used to allow a
 signalr web application to be scaled across a web farm.
 
 Installation
