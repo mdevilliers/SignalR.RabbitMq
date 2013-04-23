@@ -14,7 +14,7 @@ A compiled library is available via NuGet
 To install via the nuget package console
 
 ```PS
-Install-Package SignalR.RabbitMq
+Install-Package SignalR.RabbitMq -Pre
 ```
 
 To install via the nuget user interface in Visual Studio the package to search for is "SignalR.RabbitMq"
