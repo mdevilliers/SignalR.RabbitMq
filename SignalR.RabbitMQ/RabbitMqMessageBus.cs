@@ -25,6 +25,11 @@ namespace SignalR.RabbitMQ
 
             if (advancedConnectionInstance != null)
             {
+                advancedConnectionInstance.OnDisconnectionAction = OnConnectionLost;
+                advancedConnectionInstance.OnReconnectionAction = ConnectToRabbit;
+                advancedConnectionInstance.OnMessageRecieved =
+                    wrapper => OnReceived(0, wrapper.Id, wrapper.Messages);
+
                 _rabbitConnectionBase = advancedConnectionInstance;
             }
             else
