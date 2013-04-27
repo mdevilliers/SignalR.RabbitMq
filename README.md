@@ -38,7 +38,7 @@ var factory = new ConnectionFactory
 var exchangeName = "SignalR.RabbitMQ-Example";
 
 var configuration = new RabbitMqScaleoutConfiguration(factory, exchangeName);
-GlobalHost.DependencyResolver.UseRabbitMq(configuration); ;
+GlobalHost.DependencyResolver.UseRabbitMq(configuration);
 
 ```
 
