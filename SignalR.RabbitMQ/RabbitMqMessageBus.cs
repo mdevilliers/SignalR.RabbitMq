@@ -12,6 +12,7 @@ namespace SignalR.RabbitMQ
     {
         private readonly RabbitConnectionBase _rabbitConnectionBase;
         private readonly RabbitMqScaleoutConfiguration _configuration;
+        private readonly UniqueMessageIdentifierGenerator _messageIdentifierGenerator;
         private int _resource = 0;
 
         public RabbitMqMessageBus(IDependencyResolver resolver, RabbitMqScaleoutConfiguration configuration, RabbitConnectionBase advancedConnectionInstance = null)
@@ -38,11 +39,17 @@ namespace SignalR.RabbitMQ
                                             {
                                                 OnDisconnectionAction = OnConnectionLost,
                                                 OnReconnectionAction = ConnectToRabbit,
-                                                OnMessageRecieved =
-                                                    wrapper => OnReceived(0, wrapper.Id, wrapper.Messages)
+                                                OnMessageRecieved = ForwardOnReceivedMessage
                                             };
             }
+            _messageIdentifierGenerator = new UniqueMessageIdentifierGenerator();
             ConnectToRabbit();
+        }
+
+        private void ForwardOnReceivedMessage( RabbitMqMessageWrapper message)
+        {
+            _messageIdentifierGenerator.LastSeenMessageIdentifier(message.Id);
+            OnReceived(0, message.Id, message.Messages);
         }
 
 		protected override void Dispose(bool disposing)
@@ -78,7 +85,7 @@ namespace SignalR.RabbitMQ
                             try
                             {
                                 var messagesToSend = msgs as Message[];
-                                var message = new RabbitMqMessageWrapper(messagesToSend);
+                                var message = new RabbitMqMessageWrapper( _messageIdentifierGenerator.GetNextMessageIdentifier(), messagesToSend);
                                 _rabbitConnectionBase.Send(message);
                             }
                             catch

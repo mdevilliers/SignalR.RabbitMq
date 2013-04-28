@@ -9,9 +9,9 @@ namespace SignalR.RabbitMQ
     [Serializable]
     public class RabbitMqMessageWrapper
     {
-        public RabbitMqMessageWrapper(Message[] messages)
+        public RabbitMqMessageWrapper(ulong messageIdentifier, Message[] messages)
         {
-            Id = GetNext();
+            Id = messageIdentifier;
             Messages = messages;
         }
 
@@ -62,13 +62,7 @@ namespace SignalR.RabbitMQ
                         Bytes = ms.ToArray();
                     }
                 }
-                
             }
-        }
-
-        private static ulong GetNext()
-        {
-            return (ulong) DateTime.Now.Ticks;
         }
     }
 }

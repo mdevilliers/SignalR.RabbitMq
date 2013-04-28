@@ -64,6 +64,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RabbitMqMessageWrapper.cs" />
     <Compile Include="RabbitMqScaleoutConfiguration.cs" />
+    <Compile Include="UniqueMessageIdentifierGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
