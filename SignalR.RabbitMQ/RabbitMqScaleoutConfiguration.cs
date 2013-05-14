@@ -45,13 +45,21 @@ namespace SignalR.RabbitMQ
             this.ExchangeName = exchangeName;
             this.QueueName = queueName;
         }
-        public RabbitMqScaleoutConfiguration(IBus bus)
+        public RabbitMqScaleoutConfiguration(IBus bus, string exchangeName, string queueName = null)
         {
             if (bus == null)
             {
                 throw new ArgumentNullException("bus");
             }
+            
+            if (string.IsNullOrEmpty(exchangeName))
+            {
+                throw new ArgumentNullException("exchangeName");
+            }
+
             Bus = bus;
+            this.ExchangeName = exchangeName;
+            this.QueueName = queueName;
         }
 
         public string AmpqConnectionString { get; private set; }
