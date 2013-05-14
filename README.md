@@ -44,9 +44,9 @@ GlobalHost.DependencyResolver.UseRabbitMq(configuration);
 
 
 The SignalR.RabbitMq message bus expects to be handed a RabbitMqScaleoutConfiguration configured with either 
-1. an instance of a configured ConnectionFactory as produced by the RabbitMq.Client.
-2. an ampq connection string e.g. "host=myServer;virtualHost=myVirtualHost;username=myusername;password=topsecret" and the name of a message exchange to be used for the signalr messages 
-3. a preconfigured EasyNetQ IBus and the name of a message exchange to be used for the signalr messages.
++ an instance of a configured ConnectionFactory as produced by the RabbitMq.Client.
++  an ampq connection string e.g. "host=myServer;virtualHost=myVirtualHost;username=myusername;password=topsecret" and the name of a message exchange to be used for the signalr messages 
++  a preconfigured EasyNetQ IBus and the name of a message exchange to be used for the signalr messages.
 
 The message bus will then create the exchange if it does not already exist then listen on an anonymous queue for messages across the web farm. There will be one queue per server in the web farm. 
 
