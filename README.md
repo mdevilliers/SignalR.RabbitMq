@@ -14,7 +14,7 @@ A compiled library is available via NuGet
 To install via the nuget package console
 
 ```PS
-Install-Package SignalR.RabbitMq -Pre
+Install-Package SignalR.RabbitMq
 ```
 
 To install via the nuget user interface in Visual Studio the package to search for is "SignalR.RabbitMq"
@@ -45,8 +45,8 @@ GlobalHost.DependencyResolver.UseRabbitMq(configuration);
 
 The SignalR.RabbitMq message bus expects to be handed a RabbitMqScaleoutConfiguration configured with either 
 + an instance of a configured ConnectionFactory as produced by the RabbitMq.Client.
-+  an ampq connection string e.g. "host=myServer;virtualHost=myVirtualHost;username=myusername;password=topsecret" and the name of a message exchange to be used for the signalr messages 
-+  a preconfigured EasyNetQ IBus and the name of a message exchange to be used for the signalr messages.
++ an ampq connection string e.g. "host=myServer;virtualHost=myVirtualHost;username=myusername;password=topsecret" and the name of a message exchange to be used for the signalr messages 
++ a preconfigured EasyNetQ IBus and the name of a message exchange to be used for the signalr messages.
 
 The message bus will then create the exchange if it does not already exist then listen on an anonymous queue for messages across the web farm. There will be one queue per server in the web farm. 
 
