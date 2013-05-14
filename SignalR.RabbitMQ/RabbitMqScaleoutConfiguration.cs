@@ -1,4 +1,5 @@
 ﻿using System;
+using EasyNetQ;
 using Microsoft.AspNet.SignalR.Messaging;
 using RabbitMQ.Client;
 
@@ -44,9 +45,18 @@ namespace SignalR.RabbitMQ
             this.ExchangeName = exchangeName;
             this.QueueName = queueName;
         }
+        public RabbitMqScaleoutConfiguration(IBus bus)
+        {
+            if (bus == null)
+            {
+                throw new ArgumentNullException("bus");
+            }
+            Bus = bus;
+        }
 
         public string AmpqConnectionString { get; private set; }
         public string ExchangeName { get; private set; }
         public string QueueName { get; private set; }
+        public IBus Bus { get; private set; }
     }
 }

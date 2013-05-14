@@ -13,7 +13,7 @@ namespace SignalR.RabbitMQ
         public EasyNetQRabbitConnection(RabbitMqScaleoutConfiguration configuration) 
             : base(configuration)
         {
-            _bus = RabbitHutch.CreateBus(configuration.AmpqConnectionString).Advanced;
+            _bus = configuration.Bus != null ? configuration.Bus.Advanced : RabbitHutch.CreateBus(configuration.AmpqConnectionString).Advanced;
             //wire up the reconnection handler
             _bus.Connected += OnReconnection;
 
