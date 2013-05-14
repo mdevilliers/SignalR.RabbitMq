@@ -9,59 +9,47 @@ namespace SignalR.RabbitMQ
     [Serializable]
     public class RabbitMqMessageWrapper
     {
-        public RabbitMqMessageWrapper(ulong messageIdentifier, Message[] messages)
+        [NonSerialized]
+        [JsonIgnore]
+        private ScaleoutMessage _scaleoutMessage;
+
+        public RabbitMqMessageWrapper()
         {
+        }
+
+        public RabbitMqMessageWrapper(ulong messageIdentifier, IList<Message> messages)
+        {
+            if(messages == null)
+            {
+                throw new ArgumentNullException("messages");
+            }
             Id = messageIdentifier;
-            Messages = messages;
+            ScaleoutMessage = new ScaleoutMessage(messages);
         }
 
         public ulong Id { get; set; }
         public byte[] Bytes { get; set; }
 
-        [NonSerialized]
         [JsonIgnore]
-        private Message[] _messages;
-
-        [JsonIgnore]
-        public Message[] Messages { 
+        public ScaleoutMessage ScaleoutMessage 
+        {
             get
             {
-                if (_messages == null)
+                if(_scaleoutMessage == null)
                 {
                     using (var stream = new MemoryStream(Bytes))
                     {
                         var binaryReader = new BinaryReader(stream);
-                        var messages = new List<Message>();
-                        int count = binaryReader.ReadInt32();
-
-                        for (int i = 0; i < count; i++)
-                        {
-                            messages.Add(Message.ReadFrom(stream));
-                        }
-
-                        _messages = messages.ToArray();
+                        byte[] buffer = binaryReader.ReadBytes(Bytes.Length);
+                        _scaleoutMessage = ScaleoutMessage.FromBytes(buffer);
                     }
                 }
-                return _messages;
+                return _scaleoutMessage;
             }
             set
             {
-                if (value != null)
-                {
-                    _messages = value;
-                    using (var ms = new MemoryStream())
-                    {
-                        var binaryWriter = new BinaryWriter(ms);
-
-                        binaryWriter.Write(value.Length);
-                        for (int i = 0; i < value.Length; i++)
-                        {
-                            value[i].WriteTo(ms);
-                        }
-
-                        Bytes = ms.ToArray();
-                    }
-                }
+                Bytes = value.ToBytes();
+                _scaleoutMessage = value;
             }
         }
     }

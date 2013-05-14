@@ -15,7 +15,9 @@ namespace SignalR.RabbitMQ
         private readonly UniqueMessageIdentifierGenerator _messageIdentifierGenerator;
         private int _resource = 0;
 
-        public RabbitMqMessageBus(IDependencyResolver resolver, RabbitMqScaleoutConfiguration configuration, RabbitConnectionBase advancedConnectionInstance = null)
+        public RabbitMqMessageBus(  IDependencyResolver resolver, 
+                                    RabbitMqScaleoutConfiguration configuration, 
+                                    RabbitConnectionBase advancedConnectionInstance = null)
             : base(resolver, configuration)
         {
             if (configuration == null)
@@ -29,7 +31,7 @@ namespace SignalR.RabbitMQ
                 advancedConnectionInstance.OnDisconnectionAction = OnConnectionLost;
                 advancedConnectionInstance.OnReconnectionAction = ConnectToRabbit;
                 advancedConnectionInstance.OnMessageRecieved =
-                    wrapper => OnReceived(0, wrapper.Id, wrapper.Messages);
+                    wrapper => OnReceived(0, wrapper.Id, wrapper.ScaleoutMessage);
 
                 _rabbitConnectionBase = advancedConnectionInstance;
             }
@@ -49,7 +51,7 @@ namespace SignalR.RabbitMQ
         private void ForwardOnReceivedMessage( RabbitMqMessageWrapper message)
         {
             _messageIdentifierGenerator.LastSeenMessageIdentifier(message.Id);
-            OnReceived(0, message.Id, message.Messages);
+            OnReceived(0, message.Id, message.ScaleoutMessage);
         }
 
 		protected override void Dispose(bool disposing)
@@ -84,16 +86,19 @@ namespace SignalR.RabbitMQ
                         {
                             try
                             {
-                                var messagesToSend = msgs as Message[];
-                                var message = new RabbitMqMessageWrapper( _messageIdentifierGenerator.GetNextMessageIdentifier(), messagesToSend);
-                                _rabbitConnectionBase.Send(message);
+                                var messagesToSend = msgs as IList<Message>;
+                                if (messagesToSend != null)
+                                {
+                                    var message = new RabbitMqMessageWrapper( _messageIdentifierGenerator.GetNextMessageIdentifier(), messagesToSend);
+                                    _rabbitConnectionBase.Send(message);
+                                }
                             }
                             catch
                             {
                                 OnConnectionLost();
                             }
                         },
-                    messages.ToArray());
+                    messages);
         }
     }
 }
