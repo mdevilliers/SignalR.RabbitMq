@@ -1,7 +1,6 @@
 ﻿using System;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Messaging;
-using RabbitMQ.Client;
 
 namespace SignalR.RabbitMQ
 {
