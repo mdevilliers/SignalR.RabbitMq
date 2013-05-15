@@ -77,6 +77,5 @@ namespace SignalR.RabbitMQ
         {
             return (ulong)DateTime.UtcNow.Ticks;
         }
-
     }
 }
