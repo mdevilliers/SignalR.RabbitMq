@@ -1,17 +1,14 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿
+using Microsoft.AspNet.SignalR;
 
 namespace SignalR.RabbitMq.Example
 {
     public class Chat : Hub
     {
+        private static int _id = 0;
         public void Send(string message)
         {
-            int i = 0;
-            while (true)
-            {
-                Clients.All.addMessage(i++, Context.ConnectionId);
-            }
-            // Clients.Caller.addMessage("Message sent", "you");
+             Clients.All.addMessage(string.Format("{0} - {1}", message, _id++), Context.ConnectionId);
         }
     }
 }

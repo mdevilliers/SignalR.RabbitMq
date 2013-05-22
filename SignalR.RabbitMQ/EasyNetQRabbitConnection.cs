@@ -19,7 +19,7 @@ namespace SignalR.RabbitMQ
 
             //wire up the reconnection handler
             _bus.Connected += OnReconnection;
-
+            
             //wire up the disconnection handler
             _bus.Disconnected += OnDisconnection;
         }
@@ -40,16 +40,10 @@ namespace SignalR.RabbitMQ
             _queue = Configuration.QueueName == null
                 ? Queue.DeclareTransient()
                 : Queue.DeclareTransient(Configuration.QueueName);
-
+            
             _queue.BindTo(_exchange, "#");
             _bus.Subscribe<RabbitMqMessageWrapper>(_queue,
-                (msg, messageReceivedInfo) =>
-                    {
-                        var tcs = new TaskCompletionSource<object>();
-                        OnMessage(msg.Body);
-                        return tcs.Task;
-                    }
-                   );
+                (msg, messageReceivedInfo) => Task.Factory.StartNew(() => OnMessage(msg.Body)));
         }
 
         public override void Dispose()

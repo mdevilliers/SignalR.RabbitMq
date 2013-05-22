@@ -27,10 +27,11 @@ namespace SignalR.RabbitMQ.Console
             Task.Factory.StartNew(
                 () =>
                     {
+                        int i = 0;
                         while (true)
                         {
-                            hubContext.Clients.All.onConsoleMessage("Hello!");
-                            //Thread.Sleep(1000);
+                            hubContext.Clients.All.onConsoleMessage(i++);
+                            Thread.Sleep(100);
                         }
                     }
                 );
