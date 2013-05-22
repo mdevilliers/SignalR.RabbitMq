@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Messaging;
+using Microsoft.AspNet.SignalR.Tracing;
 
 namespace SignalR.RabbitMQ
 {
@@ -12,6 +14,7 @@ namespace SignalR.RabbitMQ
         private readonly RabbitConnectionBase _rabbitConnectionBase;
         private readonly RabbitMqScaleoutConfiguration _configuration;
         private readonly UniqueMessageIdentifierGenerator _messageIdentifierGenerator;
+        private readonly TraceSource _trace;
         private int _resource = 0;
 
         public RabbitMqMessageBus(  IDependencyResolver resolver, 
@@ -19,11 +22,14 @@ namespace SignalR.RabbitMQ
                                     RabbitConnectionBase advancedConnectionInstance = null)
             : base(resolver, configuration)
         {
+
             if (configuration == null)
             {
                 throw new ArgumentNullException("configuration");
             }
             _configuration = configuration;
+            var traceManager = resolver.Resolve<ITraceManager>();
+            _trace = traceManager["SignalR.RabbitMQ." + typeof(RabbitMqMessageBus).Name];
 
             if (advancedConnectionInstance != null)
             {
@@ -43,7 +49,7 @@ namespace SignalR.RabbitMQ
                                                 OnMessageRecieved = ForwardOnReceivedMessage
                                             };
             }
-            _messageIdentifierGenerator = new UniqueMessageIdentifierGenerator();
+            _messageIdentifierGenerator = new UniqueMessageIdentifierGenerator(resolver);
             ConnectToRabbit();
         }
 
@@ -89,6 +95,7 @@ namespace SignalR.RabbitMQ
                                 if (messagesToSend != null)
                                 {
                                     var message = new RabbitMqMessageWrapper( _messageIdentifierGenerator.GetNextMessageIdentifier(), messagesToSend);
+                                    _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Message sent {0}", message.Id));
                                     _rabbitConnectionBase.Send(message);
                                 }
                             }

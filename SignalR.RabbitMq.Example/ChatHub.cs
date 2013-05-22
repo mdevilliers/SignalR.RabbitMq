@@ -6,8 +6,12 @@ namespace SignalR.RabbitMq.Example
     {
         public void Send(string message)
         {
-            Clients.All.addMessage(message, Context.ConnectionId);
-           // Clients.Caller.addMessage("Message sent", "you");
+
+            while (true)
+            {
+                Clients.All.addMessage(message, Context.ConnectionId);
+            }
+            // Clients.Caller.addMessage("Message sent", "you");
         }
     }
 }

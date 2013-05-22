@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
+using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Tracing;
 
 namespace SignalR.RabbitMQ
 {
@@ -26,11 +29,16 @@ namespace SignalR.RabbitMQ
      */
     internal class UniqueMessageIdentifierGenerator
     {
-        private ulong _lastSeenMessageIdentifier;
+        private static ulong _lastSeenMessageIdentifier;
+        private readonly TraceSource _trace;
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
-        public UniqueMessageIdentifierGenerator()
+        public UniqueMessageIdentifierGenerator(IDependencyResolver resolver)
         {
+            var traceManager = resolver.Resolve<ITraceManager>();
+            _trace = traceManager["SignalR.RabbitMQ." + typeof(UniqueMessageIdentifierGenerator).Name];
+
+            _trace.TraceEvent(TraceEventType.Information, 0, "UniqueMessageIdentifierGenerator instance created.");
             _lastSeenMessageIdentifier = GenerateValue();
         }
 
@@ -41,12 +49,13 @@ namespace SignalR.RabbitMQ
                 _lock.EnterWriteLock();
                 if (identifier > _lastSeenMessageIdentifier)
                 {
+                    _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Updating _lastSeenMessageIdentifier {0}.", identifier));
                     _lastSeenMessageIdentifier = identifier;
-
                 }
                 else if (identifier == _lastSeenMessageIdentifier)
-                {
+                { 
                     _lastSeenMessageIdentifier++;
+                    _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Incremented _lastSeenMessageIdentifier {0}.", _lastSeenMessageIdentifier));
                 }
                 //loose the value
             }finally
@@ -62,10 +71,15 @@ namespace SignalR.RabbitMQ
                 _lock.EnterWriteLock();
 
                 var toReturn = GenerateValue();
-                if (toReturn < _lastSeenMessageIdentifier)
+                if (toReturn <= _lastSeenMessageIdentifier)
                 {
-                    return _lastSeenMessageIdentifier++;
+                    var latest = _lastSeenMessageIdentifier++;
+                    _lastSeenMessageIdentifier = latest;
+                    _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Returning incremented {0}.", latest));
+                    return latest;
                 }
+                _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Returning generated value {0}.", toReturn));
+                _lastSeenMessageIdentifier = toReturn;
                 return toReturn;
             }finally
             {
