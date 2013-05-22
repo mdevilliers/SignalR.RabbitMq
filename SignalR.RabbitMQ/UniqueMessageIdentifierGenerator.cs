@@ -30,9 +30,9 @@ namespace SignalR.RabbitMQ
     internal class UniqueMessageIdentifierGenerator
     {
         private static ulong _lastSeenMessageIdentifier;
+        private static readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
         private readonly TraceSource _trace;
-        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
-
+        
         public UniqueMessageIdentifierGenerator(IDependencyResolver resolver)
         {
             var traceManager = resolver.Resolve<ITraceManager>();
@@ -74,7 +74,6 @@ namespace SignalR.RabbitMQ
                 if (toReturn <= _lastSeenMessageIdentifier)
                 {
                     var latest = _lastSeenMessageIdentifier++;
-                    _lastSeenMessageIdentifier = latest;
                     _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Returning incremented {0}.", latest));
                     return latest;
                 }
