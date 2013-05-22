@@ -87,24 +87,24 @@ namespace SignalR.RabbitMQ
         
         protected override Task Send(IList<Message> messages)
         {
-            return Task.Factory.StartNew(msgs =>
-                        {
-                            try
-                            {
-                                var messagesToSend = msgs as IList<Message>;
-                                if (messagesToSend != null)
-                                {
-                                    var message = new RabbitMqMessageWrapper( _messageIdentifierGenerator.GetNextMessageIdentifier(), messagesToSend);
-                                    _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Message sent {0}", message.Id));
-                                    _rabbitConnectionBase.Send(message);
-                                }
-                            }
-                            catch
-                            {
-                                OnConnectionLost();
-                            }
-                        },
-                    messages);
+            var tcs = new TaskCompletionSource<object>();
+
+            try
+            {
+                var messagesToSend =messages;
+                if (messagesToSend != null)
+                {
+                    var message = new RabbitMqMessageWrapper( _messageIdentifierGenerator.GetNextMessageIdentifier(), messagesToSend);
+                    _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Message sent {0}", message.Id));
+                    _rabbitConnectionBase.Send(message);
+                }
+            }
+            catch
+            {
+                OnConnectionLost();
+            }
+
+            return tcs.Task;
         }
     }
 }
