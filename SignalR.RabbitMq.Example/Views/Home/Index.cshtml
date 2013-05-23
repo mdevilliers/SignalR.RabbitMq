@@ -41,7 +41,7 @@
         $("#broadcast").hide();
 
         // Start the connection
-        $.connection.hub.start({transport: 'auto'},function () {
+        $.connection.hub.start(function () {
             $("#broadcast").show();
             console.log("Success");
         });
