@@ -16,6 +16,10 @@ namespace SignalR.RabbitMQ
         public RabbitMqMessageWrapper()
         {
         }
+        
+        public RabbitMqMessageWrapper( IList<Message> messages) : this(0,messages)
+        {
+        }
 
         public RabbitMqMessageWrapper(ulong messageIdentifier, IList<Message> messages)
         {

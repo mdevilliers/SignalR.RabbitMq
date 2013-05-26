@@ -21,11 +21,7 @@ namespace SignalR.RabbitMQ
      
      The effect of this kungfu will be that every server will keep the messages in the correct order for the same hub/user combination.
      The fact server times are never synced will also be mitigated?
-     
-     Caveat
-     -----
-     If you are generating more than a 10,000 messages every millisecond you are in trouble.
-     
+
      */
     internal class UniqueMessageIdentifierGenerator
     {
@@ -36,9 +32,10 @@ namespace SignalR.RabbitMQ
         public UniqueMessageIdentifierGenerator(IDependencyResolver resolver)
         {
             var traceManager = resolver.Resolve<ITraceManager>();
+            
             _trace = traceManager["SignalR.RabbitMQ." + typeof(UniqueMessageIdentifierGenerator).Name];
-
             _trace.TraceEvent(TraceEventType.Information, 0, "UniqueMessageIdentifierGenerator instance created.");
+
             _lastSeenMessageIdentifier = GenerateValue();
         }
 
@@ -49,15 +46,18 @@ namespace SignalR.RabbitMQ
                 _lock.EnterWriteLock();
                 if (identifier > _lastSeenMessageIdentifier)
                 {
-                    _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Updating _lastSeenMessageIdentifier {0}.", identifier));
                     _lastSeenMessageIdentifier = identifier;
+                    _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Updated _lastSeenMessageIdentifier {0}.", identifier));
                 }
                 else if (identifier == _lastSeenMessageIdentifier)
-                { 
+                {
                     _lastSeenMessageIdentifier++;
-                    _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Incremented _lastSeenMessageIdentifier {0}.", _lastSeenMessageIdentifier));
+                    _trace.TraceEvent(TraceEventType.Information, 0,string.Format("Incremented _lastSeenMessageIdentifier {0}.",_lastSeenMessageIdentifier));
                 }
-                //loose the value
+                else
+                {
+                    _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Losing {0}, _lastSeenMessageIdentifier {0}.", identifier, _lastSeenMessageIdentifier));
+                }
             }finally
             {
                 _lock.ExitWriteLock();   

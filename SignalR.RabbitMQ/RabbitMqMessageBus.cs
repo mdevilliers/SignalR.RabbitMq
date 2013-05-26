@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -14,6 +15,13 @@ namespace SignalR.RabbitMQ
         private readonly RabbitConnectionBase _rabbitConnectionBase;
         private readonly RabbitMqScaleoutConfiguration _configuration;
         private readonly UniqueMessageIdentifierGenerator _messageIdentifierGenerator;
+        private Task _sendingworkerTask;
+        private Task _recievingworkerTask;
+        private static readonly BlockingCollection<RabbitMqMessageWrapper> _sendingbuffer
+                = new BlockingCollection<RabbitMqMessageWrapper>(new ConcurrentQueue<RabbitMqMessageWrapper>());
+        private static readonly BlockingCollection<RabbitMqMessageWrapper> _recievingbuffer
+                = new BlockingCollection<RabbitMqMessageWrapper>(new ConcurrentQueue<RabbitMqMessageWrapper>());
+
         private readonly TraceSource _trace;
         private int _resource = 0;
 
@@ -36,7 +44,7 @@ namespace SignalR.RabbitMQ
                 advancedConnectionInstance.OnDisconnectionAction = OnConnectionLost;
                 advancedConnectionInstance.OnReconnectionAction = ConnectToRabbit;
                 advancedConnectionInstance.OnMessageRecieved =
-                    wrapper => OnReceived(0, wrapper.Id, wrapper.ScaleoutMessage);
+                    wrapper => _recievingbuffer.Add(wrapper);
 
                 _rabbitConnectionBase = advancedConnectionInstance;
             }
@@ -46,17 +54,30 @@ namespace SignalR.RabbitMQ
                                             {
                                                 OnDisconnectionAction = OnConnectionLost,
                                                 OnReconnectionAction = ConnectToRabbit,
-                                                OnMessageRecieved = ForwardOnReceivedMessage
+                                                OnMessageRecieved = wrapper => _recievingbuffer.Add(wrapper)
                                             };
             }
             _messageIdentifierGenerator = new UniqueMessageIdentifierGenerator(resolver);
             ConnectToRabbit();
-        }
 
-        private void ForwardOnReceivedMessage( RabbitMqMessageWrapper message)
-        {
-            _messageIdentifierGenerator.LastSeenMessageIdentifier(message.Id);
-            OnReceived(0, message.Id, message.ScaleoutMessage);
+            _recievingworkerTask = Task.Factory.StartNew(()=>
+            {
+                while (true)
+                {
+                    foreach (var message in _recievingbuffer.GetConsumingEnumerable())
+                    {
+                        try
+                        {
+                            _messageIdentifierGenerator.LastSeenMessageIdentifier(message.Id);
+                            OnReceived(0, message.Id, message.ScaleoutMessage);
+                        }
+                        catch
+                        {
+                            OnConnectionLost();
+                        }
+                    }
+                }
+            });
         }
 
 		protected override void Dispose(bool disposing)
@@ -82,29 +103,35 @@ namespace SignalR.RabbitMQ
                 return;
             }
             _rabbitConnectionBase.StartListening();
-            Open(0); 
+            Open(0);
+
+            _sendingworkerTask = Task.Factory.StartNew(() =>
+            {
+                while (true)
+                {
+                    foreach (var message in _sendingbuffer.GetConsumingEnumerable())
+                    {
+                        try
+                        {
+                            message.Id = _messageIdentifierGenerator.GetNextMessageIdentifier();
+                            _rabbitConnectionBase.Send(message);
+                            _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Message sent {0}", message.Id));
+                        }
+                        catch
+                        {
+                            OnConnectionLost();
+                        }
+                    }
+                }
+            });
+
         }
         
         protected override Task Send(IList<Message> messages)
         {
-            return Task.Factory.StartNew(msgs =>
-            {
-                try
-                {
-                    var messagesToSend = msgs as IList<Message>;
-                    if (messagesToSend != null)
-                    {
-                        var message = new RabbitMqMessageWrapper(_messageIdentifierGenerator.GetNextMessageIdentifier(), messagesToSend);
-                        _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Message sent {0}", message.Id));
-                        _rabbitConnectionBase.Send(message);
-                    }
-                }
-                catch
-                {
-                    OnConnectionLost();
-                }
-            },
-            messages);
+            _sendingbuffer.Add(new RabbitMqMessageWrapper(messages));
+            var tcs = new TaskCompletionSource<object>();
+            return tcs.Task;
         }
     }
 }
