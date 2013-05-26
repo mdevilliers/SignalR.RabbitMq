@@ -8,7 +8,10 @@ namespace SignalR.RabbitMq.Example
         private static int _id = 0;
         public void Send(string message)
         {
-             Clients.All.addMessage(string.Format("{0} - {1}", message, _id++), Context.ConnectionId);
+            for (int i = 0; i < 20; i++)
+            {
+                Clients.All.addMessage(string.Format("{0} - {1}", message, _id++), Context.ConnectionId);   
+            }
         }
     }
 }

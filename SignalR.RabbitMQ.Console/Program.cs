@@ -31,7 +31,8 @@ namespace SignalR.RabbitMQ.Console
                         while (true)
                         {
                             hubContext.Clients.All.onConsoleMessage(i++);
-                            Thread.Sleep(100);
+                            System.Console.WriteLine(i);
+                            Thread.Sleep(10);
                         }
                     }
                 );
