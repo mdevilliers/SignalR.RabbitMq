@@ -7,7 +7,7 @@ namespace SignalR.RabbitMQ
 {
     public class RabbitMqScaleoutConfiguration : ScaleoutConfiguration
     {
-        public RabbitMqScaleoutConfiguration(string ampqConnectionString, string exchangeName, string queueName = null)
+        public RabbitMqScaleoutConfiguration(string ampqConnectionString, string exchangeName, string queueName = null, string stampExchangeName = "signalr-stamp")
         {
             if (string.IsNullOrEmpty(ampqConnectionString))
             {
@@ -22,8 +22,9 @@ namespace SignalR.RabbitMQ
             this.AmpqConnectionString = ampqConnectionString;
             this.ExchangeName = exchangeName;
             this.QueueName = queueName;
+            this.StampExchangeName = stampExchangeName;
         }
-        public RabbitMqScaleoutConfiguration(ConnectionFactory connectionfactory, string exchangeName, string queueName = null)
+        public RabbitMqScaleoutConfiguration(ConnectionFactory connectionfactory, string exchangeName, string queueName = null, string stampExchangeName = "signalr-stamp")
         {
             if (connectionfactory == null)
             {
@@ -44,6 +45,7 @@ namespace SignalR.RabbitMQ
             this.AmpqConnectionString = ampqConnectionString;
             this.ExchangeName = exchangeName;
             this.QueueName = queueName;
+            this.StampExchangeName = stampExchangeName;
         }
         public RabbitMqScaleoutConfiguration(IBus bus, string exchangeName, string queueName = null)
         {
@@ -64,6 +66,7 @@ namespace SignalR.RabbitMQ
 
         public string AmpqConnectionString { get; private set; }
         public string ExchangeName { get; private set; }
+        public string StampExchangeName { get; private set; }
         public string QueueName { get; private set; }
         public IBus Bus { get; private set; }
     }

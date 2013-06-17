@@ -14,7 +14,6 @@ namespace SignalR.RabbitMQ
     {
         private readonly RabbitConnectionBase _rabbitConnectionBase;
         private readonly RabbitMqScaleoutConfiguration _configuration;
-        private readonly UniqueMessageIdentifierGenerator _messageIdentifierGenerator;
         private Task _sendingworkerTask;
         private Task _recievingworkerTask;
         private static readonly BlockingCollection<RabbitMqMessageWrapper> _sendingbuffer
@@ -36,6 +35,7 @@ namespace SignalR.RabbitMQ
                 throw new ArgumentNullException("configuration");
             }
             _configuration = configuration;
+
             var traceManager = resolver.Resolve<ITraceManager>();
             _trace = traceManager["SignalR.RabbitMQ." + typeof(RabbitMqMessageBus).Name];
 
@@ -57,7 +57,7 @@ namespace SignalR.RabbitMQ
                                                 OnMessageRecieved = wrapper => _recievingbuffer.Add(wrapper)
                                             };
             }
-            _messageIdentifierGenerator = new UniqueMessageIdentifierGenerator(resolver);
+
             ConnectToRabbit();
 
             _recievingworkerTask = Task.Factory.StartNew(()=>
@@ -68,7 +68,6 @@ namespace SignalR.RabbitMQ
                     {
                         try
                         {
-                            _messageIdentifierGenerator.LastSeenMessageIdentifier(message.Id);
                             OnReceived(0, message.Id, message.ScaleoutMessage);
                         }
                         catch
@@ -113,9 +112,7 @@ namespace SignalR.RabbitMQ
                     {
                         try
                         {
-                            message.Id = _messageIdentifierGenerator.GetNextMessageIdentifier();
                             _rabbitConnectionBase.Send(message);
-                            _trace.TraceEvent(TraceEventType.Information, 0, string.Format("Message sent {0}", message.Id));
                         }
                         catch
                         {

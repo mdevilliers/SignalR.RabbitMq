@@ -1,6 +1,9 @@
+using System;
+using System.Collections;
 using System.Threading.Tasks;
 using EasyNetQ;
 using EasyNetQ.Topology;
+using Queue = EasyNetQ.Topology.Queue;
 
 namespace SignalR.RabbitMQ
 {
@@ -8,7 +11,8 @@ namespace SignalR.RabbitMQ
     {
         private readonly IAdvancedBus _bus;   
         private IQueue _queue;
-        private IExchange _exchange;
+        private IExchange _stampExchange;
+        private IExchange _receiveexchange;
 
         public EasyNetQRabbitConnection(RabbitMqScaleoutConfiguration configuration) 
             : base(configuration)
@@ -29,21 +33,29 @@ namespace SignalR.RabbitMQ
             using (var channel = _bus.OpenPublishChannel())
             {
                 var messageToSend = new Message<RabbitMqMessageWrapper>(message);
-                channel.Publish(_exchange, string.Empty, messageToSend);
+                messageToSend.Properties.Headers.Add("forward_exchange", Configuration.ExchangeName);
+
+                channel.Publish(_stampExchange, string.Empty, messageToSend);
             }   
         }
 
         public override void StartListening()
         {
-            _exchange = Exchange.DeclareFanout(Configuration.ExchangeName);
-
+            _receiveexchange = Exchange.DeclareFanout(Configuration.ExchangeName);
+            _stampExchange = new StampExchange(Configuration.StampExchangeName);
+           
             _queue = Configuration.QueueName == null
                 ? Queue.DeclareTransient()
                 : Queue.DeclareTransient(Configuration.QueueName);
             
-            _queue.BindTo(_exchange, "#");
+            _queue.BindTo(_receiveexchange, "#");
             _bus.Subscribe<RabbitMqMessageWrapper>(_queue,
-                (msg, messageReceivedInfo) => Task.Factory.StartNew(() => OnMessage(msg.Body)));
+                (msg, messageReceivedInfo) =>
+                    {
+                        var message = msg.Body;
+                        message.Id = (ulong)Convert.ToInt64(msg.Properties.Headers["stamp"]);
+                        return Task.Factory.StartNew(() => OnMessage(message));
+                    });
         }
 
         public override void Dispose()
@@ -52,4 +64,20 @@ namespace SignalR.RabbitMQ
             base.Dispose();
         }
     }
+
+    public class StampExchange : Exchange
+    {
+        public StampExchange(string name) : this(name, "x-stamp")
+        {
+            
+        }
+        protected StampExchange(string name, string exchangeType) : base(name, exchangeType)
+        {
+        }
+
+        protected StampExchange(string name, string exchangeType, bool autoDelete, IDictionary arguments) : base(name, exchangeType, autoDelete, arguments)
+        {
+        }
+    }
+
 }

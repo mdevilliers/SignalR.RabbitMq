@@ -17,21 +17,18 @@ namespace SignalR.RabbitMQ
         {
         }
         
-        public RabbitMqMessageWrapper( IList<Message> messages) : this(0,messages)
+        public RabbitMqMessageWrapper( IList<Message> messages)
         {
-        }
-
-        public RabbitMqMessageWrapper(ulong messageIdentifier, IList<Message> messages)
-        {
-            if(messages == null)
+            if (messages == null)
             {
                 throw new ArgumentNullException("messages");
             }
-            Id = messageIdentifier;
             ScaleoutMessage = new ScaleoutMessage(messages);
         }
 
+        [JsonIgnore]
         public ulong Id { get; set; }
+
         public byte[] Bytes { get; set; }
 
         [JsonIgnore]
