@@ -1,13 +1,11 @@
-SignalR.RabbitMq
-================
+#SignalR.RabbitMq
 
-About
------
-SignalR.RabbitMq is an implementation of an ScaleOutMessageBus using RabbitMq as the backing store and would be used to allow a
+#About
+
+SignalR.RabbitMq is an implementation of an ScaleOutMessageBus using RabbitMq as the backing store. This allows a
 signalr web application to be scaled across a web farm.
 
-Installation
-------------
+#Installation
 
 
 .Net
@@ -33,11 +31,10 @@ To install follow the instructions at https://github.com/mdevilliers/rabbitmq-st
 If building from source details are available from https://github.com/mdevilliers/rabbitmq-stamp
 
 
-Usage
-------
+#Usage
 
-General Usage
--------------
+
+#General Usage
 
 The example web project shows how you could configure the message bus in the global.asax.cs file.
 
@@ -68,8 +65,8 @@ It is recommended that each application should specify its own application name.
 The message exchange should only be used for signalr messages.
 
 
-Send to client via message bus
-------------------------------
+#Send to client via message bus
+
 
 One benefit of using the message bus is to send messages directly to connected clients from another process.
 
@@ -105,8 +102,7 @@ Task.Factory.StartNew(
 The onConsoleMessage method is a javascript function on the client.
 The message "Hello!" is put onto the message bus and relayed by the web application to the connected clients.
 
-Advanced
---------
+#Advanced
 
 Everyone likes to be in control so if you have a specific requirements on connecting to RabbitMQ or if you need to audit connections or messages you can supply your own class that extends RabbitConnectionBase.
 
@@ -118,13 +114,12 @@ GlobalHost.DependencyResolver.UseRabbitMqAdvanced(...);
 
 Please see the implementation of EasyNetQRabbitConnection for an example implementation.
 
-FAQ
----
+#FAQ
+
 
 The library uses EasyNetQ as a sane wrapper of the RabbitMQ.Client
 
-Contributers
-------------
+#Contributers
 
 Thanks to -
 
