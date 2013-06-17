@@ -35,8 +35,8 @@ If you want to build the plugin from source details are available from https://g
 
 #Usage
 
-
-#General Usage
+General Usage
+-------------
 
 The example web project shows how you could configure the message bus in the global.asax.cs file.
 
@@ -66,9 +66,8 @@ It is recommended that each application should specify its own application name.
 
 The message exchange should only be used for signalr messages.
 
-
-#Send to client via message bus
-
+Send to client via message bus
+------------------------------
 
 One benefit of using the message bus is to send messages directly to connected clients from another process.
 
