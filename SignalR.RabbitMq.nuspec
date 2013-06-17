@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>SignalR.RabbitMq</id>
+    <version>2.1.1</version>
+    <authors>Mark deVilliers</authors>
+    <owners>Mark deVilliers</owners>
+    <licenseUrl>https://raw.github.com/mdevilliers/SignalR.RabbitMq/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/mdevilliers/SignalR.RabbitMq</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Implementation of a SignalR backplane with RabbitMq as the backing store.</description>
+    <releaseNotes>Upgrade to sync with the 1.1.1 release of SignalR.</releaseNotes>
+    <copyright>Copyright 2013</copyright>
+    <tags>SignalR RabbitMQ</tags>
+    <dependencies>
+	  <dependency id="EasyNetQ" version="0.9.2.68" />
+      <dependency id="Newtonsoft.Json" version="4.5.11" />
+      <dependency id="RabbitMQ.Client" version="3.0.0" />
+      <dependency id="Microsoft.AspNet.SignalR.Core" version="1.1.1" />
+    </dependencies>
+  </metadata>
+   <files>
+		<file src="rabbitmq-plugin\*.*" target="rabbitmq-plugin" />
+		<file src="build\readme.txt" target="readme.txt" />
+		<file src="SignalR.RabbitMQ\bin\Debug\SignalR.RabbitMQ.*" target="lib\net40" />
+		<file src="SignalR.RabbitMQ\*.cs" target="src" />
+	</files>
+</package>
