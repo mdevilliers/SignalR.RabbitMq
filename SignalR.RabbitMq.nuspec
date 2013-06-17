@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/mdevilliers/SignalR.RabbitMq</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Implementation of a SignalR backplane with RabbitMq as the backing store.</description>
-    <releaseNotes>Upgrade to sync with the 1.1.1 release of SignalR.</releaseNotes>
+    <releaseNotes>Bug Fix. This build syncs with the 1.1.1 release of SignalR.</releaseNotes>
     <copyright>Copyright 2013</copyright>
     <tags>SignalR RabbitMQ</tags>
     <dependencies>
