@@ -9,6 +9,10 @@ signalr web application to be scaled across a web farm.
 Installation
 ------------
 
+
+.Net
+----
+
 A compiled library is available via NuGet
 
 To install via the nuget package console
@@ -18,6 +22,16 @@ Install-Package SignalR.RabbitMq
 ```
 
 To install via the nuget user interface in Visual Studio the package to search for is "SignalR.RabbitMq"
+
+RabbitMQ
+--------
+
+If installing from the Nuget package install the complied version of the rabbitmq-stamp plugin for RabbitMQ from the rabbitmq-plugin folder.
+
+To install follow the instructions at https://github.com/mdevilliers/rabbitmq-stamp
+
+If building from source details are available from https://github.com/mdevilliers/rabbitmq-stamp
+
 
 Usage
 ------
@@ -41,7 +55,6 @@ var configuration = new RabbitMqScaleoutConfiguration(factory, exchangeName);
 GlobalHost.DependencyResolver.UseRabbitMq(configuration);
 
 ```
-
 
 The SignalR.RabbitMq message bus expects to be handed a RabbitMqScaleoutConfiguration configured with either 
 + an instance of a configured ConnectionFactory as produced by the RabbitMq.Client.
