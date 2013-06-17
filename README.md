@@ -7,7 +7,6 @@ signalr web application to be scaled across a web farm.
 
 #Installation
 
-
 .Net
 ----
 
@@ -24,12 +23,15 @@ To install via the nuget user interface in Visual Studio the package to search f
 RabbitMQ
 --------
 
-If installing from the Nuget package install the complied version of the rabbitmq-stamp plugin for RabbitMQ from the rabbitmq-plugin folder.
+For the messagebus to work you need to install a custom exchange type via the plugin - rabbitmq-stamp.
 
-To install follow the instructions at https://github.com/mdevilliers/rabbitmq-stamp
+A complied version is available in the rabbitmq-plugin folder.
 
-If building from source details are available from https://github.com/mdevilliers/rabbitmq-stamp
+To install the plugin please follow the instructions at http://www.rabbitmq.com/plugins.html.
 
+The source of the plugin is available from https://github.com/mdevilliers/rabbitmq-stamp.
+
+If you want to build the plugin from source details are available from https://github.com/mdevilliers/rabbitmq-stamp
 
 #Usage
 
