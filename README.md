@@ -27,6 +27,10 @@ For the messagebus to work you need to install a custom exchange type via the pl
 
 A complied version is available in the rabbitmq-plugin folder.
 
+The plugin has been compiled using Erlang R16B. 
+
+If your installation uses a previous version of Erlang you will need to recompile the source.
+
 To install the plugin please follow the instructions at http://www.rabbitmq.com/plugins.html.
 
 The source of the plugin is available from https://github.com/mdevilliers/rabbitmq-stamp.
