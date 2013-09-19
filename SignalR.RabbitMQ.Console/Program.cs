@@ -1,9 +1,9 @@
 ﻿
 using Microsoft.AspNet.SignalR;
 using RabbitMQ.Client;
-using SignalR.RabbitMq.Example;
 using System.Threading;
 using System.Threading.Tasks;
+using SignalR.RabbitMq.Console;
 
 namespace SignalR.RabbitMQ.Console
 {
@@ -14,7 +14,8 @@ namespace SignalR.RabbitMQ.Console
             var factory = new ConnectionFactory
             {
                 UserName = "guest",
-                Password = "guest"
+                Password = "guest",
+                HostName = "192.168.60.2"
             };
 
             var exchangeName = "SignalR.RabbitMQ-Example";
@@ -22,6 +23,7 @@ namespace SignalR.RabbitMQ.Console
             var configuration = new RabbitMqScaleoutConfiguration(factory, exchangeName);
             GlobalHost.DependencyResolver.UseRabbitMq(configuration); ;
 
+            var examplePacketSize = 1024*2;
             var hubContext = GlobalHost.ConnectionManager.GetHubContext<Chat>();
 
             Task.Factory.StartNew(
@@ -30,9 +32,14 @@ namespace SignalR.RabbitMQ.Console
                         int i = 0;
                         while (true)
                         {
-                            hubContext.Clients.All.onConsoleMessage(i++);
+                            var message = string.Format("Message Id - {0}, Message Padded To {1} bytes." , i, examplePacketSize);
+                            var noise = message.PadRight(examplePacketSize, '-');
+
+                            hubContext.Clients.All.onConsoleMessage(noise);
                             System.Console.WriteLine(i);
+                            i++;
                             Thread.Sleep(100);
+
                         }
                     }
                 );
