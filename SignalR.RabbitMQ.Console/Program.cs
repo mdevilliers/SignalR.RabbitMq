@@ -21,7 +21,7 @@ namespace SignalR.RabbitMQ.Console
             var exchangeName = "SignalR.RabbitMQ-Example";
 
             var configuration = new RabbitMqScaleoutConfiguration(factory, exchangeName);
-            GlobalHost.DependencyResolver.UseRabbitMq(configuration); ;
+            GlobalHost.DependencyResolver.UseRabbitMq(configuration);
 
             var examplePacketSize = 1024*2;
             var hubContext = GlobalHost.ConnectionManager.GetHubContext<Chat>();
