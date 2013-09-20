@@ -29,7 +29,7 @@ A complied version is available in the rabbitmq-plugin folder.
 
 The plugin has been compiled using Erlang R16B. 
 
-If your installation uses a previous version of Erlang you will need to recompile the source.
+If your installation uses a previous version of Erlang you will need to recompile the source (or raise a ticket and I'm sure I can sort you out).
 
 To install the plugin please follow the instructions at http://www.rabbitmq.com/plugins.html.
 
