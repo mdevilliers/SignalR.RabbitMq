@@ -9,9 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{81DCE2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalR.RabbitMQ", "SignalR.RabbitMQ\SignalR.RabbitMQ.csproj", "{8051D7BF-5DF2-409E-997F-A5B772F3E417}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalR.RabbitMq.Example", "SignalR.RabbitMq.Example\SignalR.RabbitMq.Example.csproj", "{14E5A280-2BF5-462C-8D30-4082C138FADB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalR.RabbitMQ.Console", "SignalR.RabbitMQ.Console\SignalR.RabbitMQ.Console.csproj", "{EA9E7970-6269-4C71-92CC-860DE97BF985}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalR.RabbitMQ.Example", "SignalR.RabbitMQ.Example\SignalR.RabbitMQ.Example.csproj", "{E387E1B9-10E4-47BA-8931-8A4A64DAB922}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,14 +23,14 @@ Global
 		{8051D7BF-5DF2-409E-997F-A5B772F3E417}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8051D7BF-5DF2-409E-997F-A5B772F3E417}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8051D7BF-5DF2-409E-997F-A5B772F3E417}.Release|Any CPU.Build.0 = Release|Any CPU
-		{14E5A280-2BF5-462C-8D30-4082C138FADB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{14E5A280-2BF5-462C-8D30-4082C138FADB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{14E5A280-2BF5-462C-8D30-4082C138FADB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{14E5A280-2BF5-462C-8D30-4082C138FADB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EA9E7970-6269-4C71-92CC-860DE97BF985}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EA9E7970-6269-4C71-92CC-860DE97BF985}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA9E7970-6269-4C71-92CC-860DE97BF985}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA9E7970-6269-4C71-92CC-860DE97BF985}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E387E1B9-10E4-47BA-8931-8A4A64DAB922}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E387E1B9-10E4-47BA-8931-8A4A64DAB922}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E387E1B9-10E4-47BA-8931-8A4A64DAB922}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E387E1B9-10E4-47BA-8931-8A4A64DAB922}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

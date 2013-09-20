@@ -57,9 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SignalR.RabbitMq.Example\ChatHub.cs">
-      <Link>ChatHub.cs</Link>
-    </Compile>
+    <Compile Include="Chat.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
