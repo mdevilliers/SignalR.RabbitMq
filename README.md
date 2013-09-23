@@ -75,7 +75,7 @@ Send to client via message bus
 
 One benefit of using the message bus is to send messages directly to connected clients from another process.
 
-From the SignalR.RabbitMQ.Console project -
+An example -
 
 ```CSHARP
 var factory = new ConnectionFactory 
