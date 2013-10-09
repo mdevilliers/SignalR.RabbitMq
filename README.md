@@ -129,3 +129,6 @@ The library uses EasyNetQ as a sane wrapper of the RabbitMQ.Client
 Thanks to -
 
 [kevingorski](https://github.com/kevingorski)
+
+[baralong](https://github.com/baralong)
+
