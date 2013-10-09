@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNet.SignalR.Messaging;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace SignalR.RabbitMQ
 {
@@ -28,6 +29,9 @@ namespace SignalR.RabbitMQ
 
         [JsonIgnore]
         public ulong Id { get; set; }
+
+        [JsonIgnore]
+        public TaskCompletionSource<object> Tcs { get; set; }
 
         public byte[] Bytes { get; set; }
 

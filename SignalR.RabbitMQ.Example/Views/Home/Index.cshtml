@@ -7,6 +7,8 @@
   
   <input type="text" id="msg" />
   <a id="broadcast" href="#">Send message</a>
+  <a id="joingroup" href="#">Join group</a>
+  <a id="sendgroup" href="#">Send group message</a>
 
 <p>Messages : </p>
 <div id="console">  </div>
@@ -40,11 +42,35 @@
              });
         });
 
+        $("#sendgroup").click(function () {
+            // Call the chat method on the server
+            chat.server.sendGroup($('#msg').val())
+             .done(function () {
+                 console.log('Success!');
+             })
+             .fail(function (e) {
+                 console.warn(e);
+             });
+        });
+
+        $("#joingroup").click(function() {
+            chat.server.joinGroup("SecretGroup")
+             .done(function () {
+                 console.log('JoinGroup Success!');
+                 $("#joingroup").hide();
+             })
+             .fail(function (e) {
+                 console.warn(e);
+             });
+        });
+        
         $("#broadcast").hide();
+        $("#joingroup").hide();
 
         // Start the connection
         $.connection.hub.start(function () {
             $("#broadcast").show();
+            $("#joingroup").show();
             console.log("Success");
         });
     });

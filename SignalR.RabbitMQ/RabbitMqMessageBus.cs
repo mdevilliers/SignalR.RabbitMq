@@ -113,10 +113,18 @@ namespace SignalR.RabbitMQ
                         try
                         {
                             _rabbitConnectionBase.Send(message);
+                            if (message.Tcs != null)
+                            {
+                                message.Tcs.TrySetResult(null);
+                            }
                         }
-                        catch
+                        catch (Exception ex)
                         {
                             OnConnectionLost();
+                            if (message.Tcs != null)
+                            {
+                                message.Tcs.TrySetException(ex);
+                            }
                         }
                     }
                 }
@@ -126,9 +134,12 @@ namespace SignalR.RabbitMQ
         
         protected override Task Send(IList<Message> messages)
         {
-            _sendingbuffer.Add(new RabbitMqMessageWrapper(messages));
-            var tcs = new TaskCompletionSource<object>();
-            return tcs.Task;
+            var buffer = new RabbitMqMessageWrapper(messages)
+            {
+                Tcs = new TaskCompletionSource<object>()
+            };
+            _sendingbuffer.Add(buffer);
+            return buffer.Tcs.Task;
         }
     }
 }

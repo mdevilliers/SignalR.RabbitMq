@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNet.SignalR;
 
 namespace SignalR.RabbitMq.Example
 {
@@ -11,5 +13,18 @@ namespace SignalR.RabbitMq.Example
             Clients.Others.addMessage(string.Format("Some one said - {0} - {1}", message, _id), Context.ConnectionId);
             _id++;
         }
+
+        private const string GroupName = "SecretGroup";
+        public void SendGroup(string message)
+        {
+            Clients.Group(GroupName).addMessage(string.Format("{0} - {1}", message, _id), GroupName);
+        }
+
+        public Task JoinGroup(string groupName)
+        {
+            return Groups.Add(Context.ConnectionId, GroupName);
+        }
+
+
     }
 }
