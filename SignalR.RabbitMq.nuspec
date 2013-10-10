@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/mdevilliers/SignalR.RabbitMq</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Implementation of a SignalR backplane with RabbitMq as the backing store.</description>
-    <releaseNotes>Integrated the new rabbit-stamp plugin (version 1.0.2). This fixes an issue with using RabbitMQ virtual hosts. This build syncs with the 1.1.3 release of SignalR.</releaseNotes>
+    <releaseNotes>Integrated the new rabbit-stamp plugin (version 1.0.2). This fixes an issue with using RabbitMQ virtual hosts. Bug fix to enable the fail and complete javascript callbacks to complete. This build syncs with the 1.1.3 release of SignalR.</releaseNotes>
     <copyright>Copyright 2013</copyright>
     <tags>SignalR RabbitMQ</tags>
     <dependencies>
