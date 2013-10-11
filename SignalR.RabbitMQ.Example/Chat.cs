@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 
 namespace SignalR.RabbitMq.Example
@@ -18,13 +17,12 @@ namespace SignalR.RabbitMq.Example
         public void SendGroup(string message)
         {
             Clients.Group(GroupName).addMessage(string.Format("{0} - {1}", message, _id), GroupName);
+            _id++;
         }
 
         public Task JoinGroup(string groupName)
         {
             return Groups.Add(Context.ConnectionId, GroupName);
         }
-
-
     }
 }
