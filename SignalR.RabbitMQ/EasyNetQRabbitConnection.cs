@@ -1,9 +1,7 @@
-using System;
-using System.Collections;
-using System.Threading.Tasks;
 using EasyNetQ;
 using EasyNetQ.Topology;
-using Queue = EasyNetQ.Topology.Queue;
+using System;
+using System.Threading.Tasks;
 
 namespace SignalR.RabbitMQ
 {
@@ -41,15 +39,15 @@ namespace SignalR.RabbitMQ
 
         public override void StartListening()
         {
-            _receiveexchange = Exchange.DeclareFanout(Configuration.ExchangeName);
-            _stampExchange = new StampExchange(Configuration.StampExchangeName);
-           
+            _receiveexchange = _bus.ExchangeDeclare(Configuration.ExchangeName, ExchangeType.Fanout);
+            _stampExchange = _bus.ExchangeDeclare(Configuration.StampExchangeName, "x-stamp");
+
             _queue = Configuration.QueueName == null
-                ? Queue.DeclareTransient()
-                : Queue.DeclareTransient(Configuration.QueueName);
-            
-            _queue.BindTo(_receiveexchange, "#");
-            _bus.Subscribe<RabbitMqMessageWrapper>(_queue,
+                        ? _bus.QueueDeclare()
+                        : _bus.QueueDeclare(Configuration.QueueName);
+
+            _bus.Bind( _receiveexchange, _queue, "#");
+            _bus.Consume<RabbitMqMessageWrapper>(_queue,
                 (msg, messageReceivedInfo) =>
                     {
                         var message = msg.Body;
@@ -64,20 +62,4 @@ namespace SignalR.RabbitMQ
             base.Dispose();
         }
     }
-
-    public class StampExchange : Exchange
-    {
-        public StampExchange(string name) : this(name, "x-stamp")
-        {
-            
-        }
-        protected StampExchange(string name, string exchangeType) : base(name, exchangeType)
-        {
-        }
-
-        protected StampExchange(string name, string exchangeType, bool autoDelete, IDictionary arguments) : base(name, exchangeType, autoDelete, arguments)
-        {
-        }
-    }
-
 }

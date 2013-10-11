@@ -29,8 +29,7 @@ namespace SignalR.RabbitMQ.Example
             {
                 UserName = "guest",
                 Password = "guest",
-                HostName = "localhost",
-                VirtualHost = "vhost"
+                HostName = "192.168.60.2"
             };
 
             var exchangeName = "SignalR.RabbitMQ-Example";
