@@ -28,13 +28,9 @@ namespace SignalR.RabbitMQ
 
         public override void Send(RabbitMqMessageWrapper message)
         {
-            using (var channel = _bus.OpenPublishChannel())
-            {
-                var messageToSend = new Message<RabbitMqMessageWrapper>(message);
-                messageToSend.Properties.Headers.Add("forward_exchange", Configuration.ExchangeName);
-
-                channel.Publish(_stampExchange, string.Empty, messageToSend);
-            }   
+            var messageToSend = new Message<RabbitMqMessageWrapper>(message);
+            messageToSend.Properties.Headers.Add("forward_exchange", Configuration.ExchangeName);
+            _bus.Publish(_stampExchange, string.Empty, false, false, messageToSend);
         }
 
         public override void StartListening()
