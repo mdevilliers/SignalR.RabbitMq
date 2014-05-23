@@ -6,6 +6,12 @@ A complied version is available in the .\Packages\SignalR.RabbitMQ.{someversion}
 
 To install the plugin please follow the instructions at http://www.rabbitmq.com/plugins.html.
 
+Copy the plugin file to the plugins folder of your rabbitmq installation.
+
+Enable the plugin
+
+sbin/rabbitmq-plugins enable rabbitmq_stamp_exchange
+
 The source of the plugin is available from https://github.com/mdevilliers/rabbitmq-stamp.
 
 If you want to build the plugin from source details are available from https://github.com/mdevilliers/rabbitmq-stamp
