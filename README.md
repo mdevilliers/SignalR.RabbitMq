@@ -34,9 +34,9 @@ If your installation uses a previous version of Erlang you will need to recompil
 To install the plugin please follow the instructions below.  More can be seen at http://www.rabbitmq.com/plugins.html.
 
 * Copy plugin to RabbitMQ plugin folder
-* Restart RabbitMQ
 * Open a command prompt and change to RabbitMQ sbin folder 
-* execute `rabbitmq-plugins enable rabbitmq_stamp_exchange`
+* Execute `rabbitmq-plugins enable rabbitmq_stamp_exchange`
+* Restart RabbitMQ
 
 The source of the plugin is available from https://github.com/mdevilliers/rabbitmq-stamp.
 
