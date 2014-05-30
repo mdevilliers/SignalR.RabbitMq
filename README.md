@@ -1,5 +1,7 @@
 #SignalR.RabbitMq
 
+[![Build status](https://ci.appveyor.com/api/projects/status/whewcnea96sispd3)](https://ci.appveyor.com/project/mdevilliers/signalr-rabbitmq)
+
 #About
 
 SignalR.RabbitMq is an implementation of an ScaleOutMessageBus using RabbitMq as the backing store. This allows a
