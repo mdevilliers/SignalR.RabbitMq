@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>SignalR.RabbitMq</id>
-    <version>2.2.1.1</version>
+    <version>2.2.1.2</version>
     <authors>Mark deVilliers</authors>
     <owners>Mark deVilliers</owners>
     <licenseUrl>https://raw.github.com/mdevilliers/SignalR.RabbitMq/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/mdevilliers/SignalR.RabbitMq</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Implementation of a SignalR backplane with RabbitMq as the backing store.</description>
-    <releaseNotes>Upgraded to a later version of EasyNetQ, SignalR. Fixed package layout. This build syncs with the 1.2.1 release of SignalR.</releaseNotes>
+    <releaseNotes>Updated plugins with a compiled version for RabbitMQ3.3. Fix for issue 28 - StampExchangeName is null with RabbitMqScaleoutConfiguration constructor with IBus. This build syncs with the 1.2.1 release of SignalR.</releaseNotes>
     <copyright>Copyright 2014</copyright>
     <tags>SignalR RabbitMQ</tags>
     <dependencies>
@@ -20,7 +20,7 @@
     </dependencies>
   </metadata>
    <files>
-		<file src="rabbitmq-plugin\*.*" target="rabbitmq-plugin" />
+		<file src="rabbitmq-plugin\**\*.*" target="rabbitmq-plugin" />
 		<file src="build\readme.txt" target="readme.txt" />
 		<file src="SignalR.RabbitMQ\bin\*\SignalR.RabbitMQ.*" target="lib\net40" />
 		<file src="SignalR.RabbitMQ\*.cs" target="src" />
