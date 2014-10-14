@@ -18,12 +18,12 @@ namespace SignalR.RabbitMQ.Console
                 HostName = "localhost"
             };
 
-            var exchangeName = "SignalR.RabbitMQ-Example";
+            const string exchangeName = "SignalR.RabbitMQ-Example";
 
             var configuration = new RabbitMqScaleoutConfiguration(factory, exchangeName);
             GlobalHost.DependencyResolver.UseRabbitMq(configuration);
 
-            var examplePacketSize = 1024*2;
+            const int examplePacketSize = 1024*2;
             var hubContext = GlobalHost.ConnectionManager.GetHubContext<Chat>();
 
             Task.Factory.StartNew(
@@ -39,7 +39,6 @@ namespace SignalR.RabbitMQ.Console
                             System.Console.WriteLine(i);
                             i++;
                             Thread.Sleep(100);
-
                         }
                     }
                 );

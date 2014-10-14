@@ -17,7 +17,7 @@ namespace SignalR.RabbitMQ
         internal Action OnReconnectionAction { get; set; }
         internal Action OnDisconnectionAction { get; set; }
         public RabbitMqScaleoutConfiguration Configuration { get; set; }
-        internal Action<RabbitMqMessageWrapper> OnMessageRecieved { get; set; }
+        internal Action<RabbitMqMessageWrapper> OnMessageReceived { get; set; }
 
         public virtual void Dispose()
         {
@@ -52,7 +52,7 @@ namespace SignalR.RabbitMQ
 
         protected void OnMessage(RabbitMqMessageWrapper message)
         {
-            OnMessageRecieved.Invoke(message);
+            OnMessageReceived.Invoke(message);
         }
     }
 }
