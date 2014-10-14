@@ -19,10 +19,10 @@ namespace SignalR.RabbitMQ
                 throw new ArgumentNullException("exchangeName");
             }
 
-            this.AmpqConnectionString = ampqConnectionString;
-            this.ExchangeName = exchangeName;
-            this.QueueName = queueName;
-            this.StampExchangeName = stampExchangeName;
+            AmpqConnectionString = ampqConnectionString;
+            ExchangeName = exchangeName;
+            QueueName = queueName;
+            StampExchangeName = stampExchangeName;
         }
         public RabbitMqScaleoutConfiguration(ConnectionFactory connectionfactory, string exchangeName, string queueName = null, string stampExchangeName = "signalr-stamp")
         {
@@ -42,10 +42,10 @@ namespace SignalR.RabbitMQ
             var ampqConnectionString = string.Format("host={0};virtualHost={1};username={2};password={3};requestedHeartbeat=10", connectionfactory.HostName, connectionfactory.VirtualHost, connectionfactory.UserName, connectionfactory.Password);
 #endif
             
-            this.AmpqConnectionString = ampqConnectionString;
-            this.ExchangeName = exchangeName;
-            this.QueueName = queueName;
-            this.StampExchangeName = stampExchangeName;
+            AmpqConnectionString = ampqConnectionString;
+            ExchangeName = exchangeName;
+            QueueName = queueName;
+            StampExchangeName = stampExchangeName;
         }
         public RabbitMqScaleoutConfiguration(IBus bus, string exchangeName, string queueName = null, string stampExchangeName = "signalr-stamp")
         {
@@ -59,10 +59,10 @@ namespace SignalR.RabbitMQ
                 throw new ArgumentNullException("exchangeName");
             }
 
-            this.Bus = bus;
-            this.ExchangeName = exchangeName;
-            this.QueueName = queueName;
-            this.StampExchangeName = stampExchangeName;
+            Bus = bus;
+            ExchangeName = exchangeName;
+            QueueName = queueName;
+            StampExchangeName = stampExchangeName;
         }
 
         public string AmpqConnectionString { get; private set; }

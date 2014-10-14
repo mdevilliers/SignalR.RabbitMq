@@ -1,81 +1,71 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Messaging;
-using Microsoft.AspNet.SignalR.Tracing;
 
 namespace SignalR.RabbitMQ
 {
     internal class RabbitMqMessageBus : ScaleoutMessageBus
     {
         private readonly RabbitConnectionBase _rabbitConnectionBase;
-        private readonly RabbitMqScaleoutConfiguration _configuration;
-        private Task _sendingworkerTask;
-        private Task _recievingworkerTask;
-        private static readonly BlockingCollection<RabbitMqMessageWrapper> _sendingbuffer
+
+	    private static readonly BlockingCollection<RabbitMqMessageWrapper> Sendingbuffer
                 = new BlockingCollection<RabbitMqMessageWrapper>(new ConcurrentQueue<RabbitMqMessageWrapper>());
-        private static readonly BlockingCollection<RabbitMqMessageWrapper> _recievingbuffer
+        private static readonly BlockingCollection<RabbitMqMessageWrapper> Recievingbuffer
                 = new BlockingCollection<RabbitMqMessageWrapper>(new ConcurrentQueue<RabbitMqMessageWrapper>());
 
-        private readonly TraceSource _trace;
-        private int _resource = 0;
+	    private int _resource;
 
         public RabbitMqMessageBus(  IDependencyResolver resolver, 
                                     RabbitMqScaleoutConfiguration configuration, 
                                     RabbitConnectionBase advancedConnectionInstance = null)
             : base(resolver, configuration)
         {
-
-            if (configuration == null)
+	        if (configuration == null)
             {
                 throw new ArgumentNullException("configuration");
             }
-            _configuration = configuration;
 
-            var traceManager = resolver.Resolve<ITraceManager>();
-            _trace = traceManager["SignalR.RabbitMQ." + typeof(RabbitMqMessageBus).Name];
-
-            if (advancedConnectionInstance != null)
+	        if (advancedConnectionInstance != null)
             {
                 advancedConnectionInstance.OnDisconnectionAction = OnConnectionLost;
                 advancedConnectionInstance.OnReconnectionAction = ConnectToRabbit;
-                advancedConnectionInstance.OnMessageRecieved =
-                    wrapper => _recievingbuffer.Add(wrapper);
+                advancedConnectionInstance.OnMessageReceived =
+                    wrapper => Recievingbuffer.Add(wrapper);
 
                 _rabbitConnectionBase = advancedConnectionInstance;
             }
             else
             {
-                _rabbitConnectionBase = new EasyNetQRabbitConnection(_configuration)
+                _rabbitConnectionBase = new EasyNetQRabbitConnection(configuration)
                                             {
                                                 OnDisconnectionAction = OnConnectionLost,
                                                 OnReconnectionAction = ConnectToRabbit,
-                                                OnMessageRecieved = wrapper => _recievingbuffer.Add(wrapper)
+                                                OnMessageReceived = wrapper => Recievingbuffer.Add(wrapper)
                                             };
             }
 
             ConnectToRabbit();
 
-            _recievingworkerTask = Task.Factory.StartNew(()=>
+            Task.Factory.StartNew(()=>
             {
-                while (true)
-                {
-                    foreach (var message in _recievingbuffer.GetConsumingEnumerable())
-                    {
-                        try
-                        {
-                            OnReceived(0, message.Id, message.ScaleoutMessage);
-                        }
-                        catch
-                        {
-                            OnConnectionLost();
-                        }
-                    }
-                }
+	            while (true)
+	            {
+		            foreach (var message in Recievingbuffer.GetConsumingEnumerable())
+		            {
+			            try
+			            {
+				            OnReceived(0, message.Id, message.ScaleoutMessage);
+			            }
+			            catch
+			            {
+				            OnConnectionLost();
+			            }
+		            }
+	            }
             });
         }
 
@@ -104,30 +94,30 @@ namespace SignalR.RabbitMQ
             _rabbitConnectionBase.StartListening();
             Open(0);
 
-            _sendingworkerTask = Task.Factory.StartNew(() =>
+            Task.Factory.StartNew(() =>
             {
-                while (true)
-                {
-                    foreach (var message in _sendingbuffer.GetConsumingEnumerable())
-                    {
-                        try
-                        {
-                            _rabbitConnectionBase.Send(message);
-                            if (message.Tcs != null)
-                            {
-                                message.Tcs.TrySetResult(null);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            OnConnectionLost();
-                            if (message.Tcs != null)
-                            {
-                                message.Tcs.TrySetException(ex);
-                            }
-                        }
-                    }
-                }
+	            while (true)
+	            {
+		            foreach (var message in Sendingbuffer.GetConsumingEnumerable())
+		            {
+			            try
+			            {
+				            _rabbitConnectionBase.Send(message);
+				            if (message.Tcs != null)
+				            {
+					            message.Tcs.TrySetResult(null);
+				            }
+			            }
+			            catch (Exception ex)
+			            {
+				            OnConnectionLost();
+				            if (message.Tcs != null)
+				            {
+					            message.Tcs.TrySetException(ex);
+				            }
+			            }
+		            }
+	            }
             });
 
         }
@@ -138,7 +128,7 @@ namespace SignalR.RabbitMQ
             {
                 Tcs = new TaskCompletionSource<object>()
             };
-            _sendingbuffer.Add(buffer);
+            Sendingbuffer.Add(buffer);
             return buffer.Tcs.Task;
         }
     }
