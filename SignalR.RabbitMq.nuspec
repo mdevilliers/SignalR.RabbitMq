@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Implementation of a SignalR backplane with RabbitMq as the backing store.</description>
     <releaseNotes>Updated plugins with a compiled version for RabbitMQ3.3. Fix for issue 28 - StampExchangeName is null with RabbitMqScaleoutConfiguration constructor with IBus. This build syncs with the 1.2.1 release of SignalR.</releaseNotes>
-    <copyright>Copyright 2014</copyright>
+    <copyright>Copyright 2015</copyright>
     <tags>SignalR RabbitMQ</tags>
     <dependencies>
 	  <dependency id="EasyNetQ" version="0.27.1.216" />
