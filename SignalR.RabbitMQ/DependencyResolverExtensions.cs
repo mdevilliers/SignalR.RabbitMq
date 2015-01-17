@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Messaging;
 
@@ -23,9 +24,13 @@ namespace SignalR.RabbitMQ
                 throw new ArgumentNullException("configuration");
             }
 
-            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, configuration, advancedConnectionInstance));
-            resolver.Register(typeof (IMessageBus), () => bus.Value);
+            RabbitMqMessageBus bus = null;
+            var initialized = false;
+            var syncLock = new object();
+            Func<RabbitMqMessageBus> busFactory = () => new RabbitMqMessageBus(resolver, configuration, advancedConnectionInstance);
 
+            resolver.Register(typeof (IMessageBus), () => LazyInitializer.EnsureInitialized(ref bus, ref initialized, ref syncLock, busFactory));
+            
             return resolver;
         }
     }
