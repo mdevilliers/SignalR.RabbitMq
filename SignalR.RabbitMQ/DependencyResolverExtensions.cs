@@ -19,11 +19,6 @@ namespace SignalR.RabbitMQ
 
         private static IDependencyResolver RegisterBus(IDependencyResolver resolver, RabbitMqScaleoutConfiguration configuration, RabbitConnectionBase advancedConnectionInstance = null)
         {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException("configuration");
-            }
-
             RabbitMqMessageBus bus = null;
             var initialized = false;
             var syncLock = new object();
