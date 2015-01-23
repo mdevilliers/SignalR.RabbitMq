@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Messaging;
 
@@ -8,27 +9,23 @@ namespace SignalR.RabbitMQ
     {
         public static IDependencyResolver UseRabbitMq(this IDependencyResolver resolver, RabbitMqScaleoutConfiguration configuration)
         {
-            if(configuration == null)
-            {
-                throw new ArgumentNullException("configuration");
-            }
-
-            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, configuration));
-            resolver.Register(typeof(IMessageBus), () => bus.Value);
-
-            return resolver;
+            return RegisterBus(resolver, configuration);
         }
 
         public static IDependencyResolver UseRabbitMqAdvanced(this IDependencyResolver resolver, RabbitConnectionBase myConnection, RabbitMqScaleoutConfiguration configuration)
         {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException("configuration");
-            }
+            return RegisterBus(resolver, configuration, myConnection);
+        }
 
-            var bus = new Lazy<RabbitMqMessageBus>(() => new RabbitMqMessageBus(resolver, configuration, myConnection));
-            resolver.Register(typeof(IMessageBus), () => bus.Value);
+        private static IDependencyResolver RegisterBus(IDependencyResolver resolver, RabbitMqScaleoutConfiguration configuration, RabbitConnectionBase advancedConnectionInstance = null)
+        {
+            RabbitMqMessageBus bus = null;
+            var initialized = false;
+            var syncLock = new object();
+            Func<RabbitMqMessageBus> busFactory = () => new RabbitMqMessageBus(resolver, configuration, advancedConnectionInstance);
 
+            resolver.Register(typeof (IMessageBus), () => LazyInitializer.EnsureInitialized(ref bus, ref initialized, ref syncLock, busFactory));
+            
             return resolver;
         }
     }
