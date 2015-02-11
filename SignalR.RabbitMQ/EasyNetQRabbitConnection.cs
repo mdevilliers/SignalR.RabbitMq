@@ -41,11 +41,12 @@ namespace SignalR.RabbitMQ
             _queue = Configuration.QueueName == null
                         ? _bus.QueueDeclare()
                         : _bus.QueueDeclare(Configuration.QueueName);
-
+            
             _bus.Bind( _receiveexchange, _queue, "#");
             _bus.Consume<byte[]>(_queue,
                 (msg, messageReceivedInfo) =>
                     {
+                        
                         var bytes = msg.Body;
                         var message = new RabbitMqMessageWrapper
                         {
