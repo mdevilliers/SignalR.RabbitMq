@@ -10,7 +10,7 @@ Copy the plugin file to the plugins folder of your rabbitmq installation.
 
 Enable the plugin
 
-sbin/rabbitmq-plugins enable rabbitmq_stamp_exchange
+sbin/rabbitmq-plugins enable rabbitmq_stamp
 
 The source of the plugin is available from https://github.com/mdevilliers/rabbitmq-stamp.
 
