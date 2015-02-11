@@ -21,7 +21,7 @@
    <files>
 		<file src="rabbitmq-plugin\**\*.*" target="rabbitmq-plugin" />
 		<file src="build\readme.txt" target="readme.txt" />
-		<file src="SignalR.RabbitMQ\bin\*\SignalR.RabbitMQ.*" target="lib\net45" />s
+		<file src="SignalR.RabbitMQ\bin\*\SignalR.RabbitMQ.*" target="lib\net45" />
 		<file src="SignalR.RabbitMQ\*.cs" target="src" />
 	</files>
 </package>
