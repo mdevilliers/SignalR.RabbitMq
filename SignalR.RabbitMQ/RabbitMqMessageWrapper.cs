@@ -2,16 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNet.SignalR.Messaging;
-using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace SignalR.RabbitMQ
 {
-    [Serializable]
     public class RabbitMqMessageWrapper
     {
-        [NonSerialized]
-        [JsonIgnore]
         private ScaleoutMessage _scaleoutMessage;
 
         public RabbitMqMessageWrapper()
@@ -27,15 +23,12 @@ namespace SignalR.RabbitMQ
             ScaleoutMessage = new ScaleoutMessage(messages);
         }
 
-        [JsonIgnore]
         public ulong Id { get; set; }
 
-        [JsonIgnore]
         public TaskCompletionSource<object> Tcs { get; set; }
 
         public byte[] Bytes { get; set; }
 
-        [JsonIgnore]
         public ScaleoutMessage ScaleoutMessage 
         {
             get

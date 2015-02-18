@@ -28,7 +28,7 @@ namespace SignalR.RabbitMQ
 
         public override void Send(RabbitMqMessageWrapper message)
         {
-            var messageToSend = new Message<RabbitMqMessageWrapper>(message);
+            var messageToSend = new Message<byte[]>(message.Bytes);
             messageToSend.Properties.Headers.Add("forward_exchange", Configuration.ExchangeName);
             _bus.Publish(_stampExchange, string.Empty, false, false, messageToSend);
         }
@@ -41,13 +41,18 @@ namespace SignalR.RabbitMQ
             _queue = Configuration.QueueName == null
                         ? _bus.QueueDeclare()
                         : _bus.QueueDeclare(Configuration.QueueName);
-
+            
             _bus.Bind( _receiveexchange, _queue, "#");
-            _bus.Consume<RabbitMqMessageWrapper>(_queue,
+            _bus.Consume<byte[]>(_queue,
                 (msg, messageReceivedInfo) =>
                     {
-                        var message = msg.Body;
-                        message.Id = (ulong)Convert.ToInt64(msg.Properties.Headers["stamp"]);
+                        
+                        var bytes = msg.Body;
+                        var message = new RabbitMqMessageWrapper
+                        {
+                            Bytes = bytes,
+                            Id = (ulong) Convert.ToInt64(msg.Properties.Headers["stamp"])
+                        };
                         return Task.Factory.StartNew(() => OnMessage(message));
                     });
         }
