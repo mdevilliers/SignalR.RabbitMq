@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/mdevilliers/SignalR.RabbitMq</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Implementation of a SignalR backplane with RabbitMq as the backing store.</description>
-    <releaseNotes>Added plugin version for Rabbit 3.4. Bug fix - Fixes issue of catching initial start up exceptions.</releaseNotes>
+    <releaseNotes>Updated dependancies to latest versions.</releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>SignalR RabbitMQ</tags>
     <dependencies>
