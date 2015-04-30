@@ -14,7 +14,7 @@ namespace SignalR.RabbitMQ
 
 	    private static readonly BlockingCollection<RabbitMqMessageWrapper> Sendingbuffer
                 = new BlockingCollection<RabbitMqMessageWrapper>(new ConcurrentQueue<RabbitMqMessageWrapper>());
-        private static readonly BlockingCollection<RabbitMqMessageWrapper> Recievingbuffer
+        private static readonly BlockingCollection<RabbitMqMessageWrapper> Receivingbuffer
                 = new BlockingCollection<RabbitMqMessageWrapper>(new ConcurrentQueue<RabbitMqMessageWrapper>());
 
 	    private int _resource;
@@ -29,24 +29,10 @@ namespace SignalR.RabbitMQ
                 throw new ArgumentNullException("configuration");
             }
 
-	        if (advancedConnectionInstance != null)
-            {
-                advancedConnectionInstance.OnDisconnectionAction = OnConnectionLost;
-                advancedConnectionInstance.OnReconnectionAction = ConnectToRabbit;
-                advancedConnectionInstance.OnMessageReceived =
-                    wrapper => Recievingbuffer.Add(wrapper);
-
-                _rabbitConnectionBase = advancedConnectionInstance;
-            }
-            else
-            {
-                _rabbitConnectionBase = new EasyNetQRabbitConnection(configuration)
-                                            {
-                                                OnDisconnectionAction = OnConnectionLost,
-                                                OnReconnectionAction = ConnectToRabbit,
-                                                OnMessageReceived = wrapper => Recievingbuffer.Add(wrapper)
-                                            };
-            }
+            _rabbitConnectionBase = advancedConnectionInstance ?? new EasyNetQRabbitConnection(configuration);
+            _rabbitConnectionBase.OnDisconnectionAction = OnConnectionLost;
+            _rabbitConnectionBase.OnReconnectionAction = ConnectToRabbit;
+            _rabbitConnectionBase.OnMessageReceived = wrapper => Receivingbuffer.Add(wrapper);
 
             ConnectToRabbit();
 
@@ -54,7 +40,7 @@ namespace SignalR.RabbitMQ
             {
 	            while (true)
 	            {
-		            foreach (var message in Recievingbuffer.GetConsumingEnumerable())
+		            foreach (var message in Receivingbuffer.GetConsumingEnumerable())
 		            {
 			            try
 			            {
