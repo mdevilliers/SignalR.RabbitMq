@@ -139,5 +139,7 @@ Thanks to -
 
 [ibirman](https://github.com/ibirman)
 
-[dfschwabe] (https://github.com/dfschwabe)
+[dfschwabe](https://github.com/dfschwabe)
+
+[Kntajus](https://github.com/Kntajus)
 
