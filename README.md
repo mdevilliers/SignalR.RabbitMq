@@ -123,8 +123,6 @@ Please see the implementation of EasyNetQRabbitConnection for an example impleme
 
 #FAQ
 
-Currently trails the 1.* release of SignalR for .net 4 compatability. SignalR.RabbitMQ is compatible with 2.* release and .net 4.5.
-
 The library uses EasyNetQ as a sane wrapper of the RabbitMQ.Client
 
 #Contributers
