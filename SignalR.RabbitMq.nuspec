@@ -13,8 +13,8 @@
     <copyright>Copyright 2015</copyright>
     <tags>SignalR RabbitMQ</tags>
     <dependencies>
-	   <dependency id="EasyNetQ" version="0.43.0.358" />
-      <dependency id="RabbitMQ.Client" version="3.4.3" />
+	   <dependency id="EasyNetQ" version="0.50.7.399" />
+      <dependency id="RabbitMQ.Client" version="3.5.4" />
       <dependency id="Microsoft.AspNet.SignalR.Core" version="2.2.0" />
     </dependencies>
   </metadata>

@@ -34,7 +34,7 @@ namespace SignalR.RabbitMQ
             throw new NotImplementedException("Implement the StartListening method in your Rabbit connection class.");
         }
 
-        protected void OnReconnection()
+        protected void OnReconnection(object sender, EventArgs e)
         {
             if (OnReconnectionAction != null)
             {
@@ -42,7 +42,7 @@ namespace SignalR.RabbitMQ
             }
         }
 
-        protected void OnDisconnection()
+        protected void OnDisconnection(object sender, EventArgs e)
         {
             if (OnDisconnectionAction != null)
             {
