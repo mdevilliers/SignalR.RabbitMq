@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Implementation of a SignalR backplane with RabbitMq as the backing store.</description>
     <releaseNotes>Updated dependancies to latest version of EasyNetQ.</releaseNotes>
-    <copyright>Copyright 2015</copyright>
+    <copyright>Copyright 2016</copyright>
     <tags>SignalR RabbitMQ</tags>
     <dependencies>
 	   <dependency id="EasyNetQ" version="0.50.9.401" />
