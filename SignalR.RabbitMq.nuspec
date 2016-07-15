@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/mdevilliers/SignalR.RabbitMq</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Implementation of a SignalR backplane with RabbitMq as the backing store.</description>
-    <releaseNotes>Updated dependancies to latest version of EasyNetQ.</releaseNotes>
+    <releaseNotes>Updated dependancies to latest version of RabbitMQ Client and drop reference to EasyNetQ.</releaseNotes>
     <copyright>Copyright 2016</copyright>
     <tags>SignalR RabbitMQ</tags>
     <dependencies>
