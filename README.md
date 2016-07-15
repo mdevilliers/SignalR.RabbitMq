@@ -144,3 +144,5 @@ Thanks to -
 [slovely](https://github.com/slovely)
 
 [chrisdrobison](https://github.com/chrisdrobison)
+
+[Entroper](https://github.com/Entroper)
