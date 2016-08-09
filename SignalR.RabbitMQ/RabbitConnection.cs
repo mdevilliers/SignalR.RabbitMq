@@ -45,11 +45,18 @@ namespace SignalR.RabbitMQ
             var consumer = new EventingBasicConsumer(_subscribeModel);
             consumer.Received += (sender, args) =>
             {
-                OnMessage(new RabbitMqMessageWrapper
+                try
                 {
-                    Bytes = args.Body,
-                    Id = Convert.ToUInt64(args.BasicProperties.Headers["stamp"])
-                });
+                    OnMessage(new RabbitMqMessageWrapper
+                    {
+                        Bytes = args.Body,
+                        Id = Convert.ToUInt64(args.BasicProperties.Headers["stamp"])
+                    });
+                }
+                finally
+                {
+                    _subscribeModel.BasicAck(args.DeliveryTag, multiple: false);
+                }
             };
 
             _subscribeModel.BasicConsume(Configuration.QueueName, noAck: false, consumer: consumer);
