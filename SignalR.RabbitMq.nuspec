@@ -2,14 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>SignalR.RabbitMq</id>
-    <version>2.2.6</version>
+    <version>2.2.7</version>
     <authors>Mark deVilliers</authors>
     <owners>Mark deVilliers</owners>
     <licenseUrl>https://raw.github.com/mdevilliers/SignalR.RabbitMq/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/mdevilliers/SignalR.RabbitMq</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Implementation of a SignalR backplane with RabbitMq as the backing store.</description>
-    <releaseNotes>Updated dependancies to latest version of RabbitMQ Client and drop reference to EasyNetQ.</releaseNotes>
+    <releaseNotes>Fix to ensure messages are acked.</releaseNotes>
     <copyright>Copyright 2016</copyright>
     <tags>SignalR RabbitMQ</tags>
     <dependencies>
