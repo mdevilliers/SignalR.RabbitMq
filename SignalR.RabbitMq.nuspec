@@ -2,25 +2,25 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>SignalR.RabbitMq</id>
-    <version>2.2.7</version>
+    <version>2.2.8</version>
     <authors>Mark deVilliers</authors>
     <owners>Mark deVilliers</owners>
     <licenseUrl>https://raw.github.com/mdevilliers/SignalR.RabbitMq/master/LICENSE.md</licenseUrl>
     <projectUrl>https://github.com/mdevilliers/SignalR.RabbitMq</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Implementation of a SignalR backplane with RabbitMq as the backing store.</description>
-    <releaseNotes>Fix to ensure messages are acked.</releaseNotes>
+    <releaseNotes>Upgrade of RabbitMQ library.</releaseNotes>
     <copyright>Copyright 2016</copyright>
     <tags>SignalR RabbitMQ</tags>
     <dependencies>
-      <dependency id="RabbitMQ.Client" version="3.6.3" />
+      <dependency id="RabbitMQ.Client" version="4.1.0" />
       <dependency id="Microsoft.AspNet.SignalR.Core" version="2.2.0" />
     </dependencies>
   </metadata>
    <files>
 		<file src="rabbitmq-plugin\**\*.*" target="rabbitmq-plugin" />
 		<file src="build\readme.txt" target="readme.txt" />
-		<file src="SignalR.RabbitMQ\bin\*\SignalR.RabbitMQ.*" target="lib\net45" />
+		<file src="SignalR.RabbitMQ\bin\*\SignalR.RabbitMQ.*" target="lib\net452" />
 		<file src="SignalR.RabbitMQ\*.cs" target="src" />
 	</files>
 </package>
