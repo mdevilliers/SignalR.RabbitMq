@@ -10,7 +10,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Implementation of a SignalR backplane with RabbitMq as the backing store.</description>
     <releaseNotes>Upgrade of RabbitMQ library.</releaseNotes>
-    <copyright>Copyright 2016</copyright>
+    <copyright>Copyright 2017</copyright>
     <tags>SignalR RabbitMQ</tags>
     <dependencies>
       <dependency id="RabbitMQ.Client" version="4.1.0" />
